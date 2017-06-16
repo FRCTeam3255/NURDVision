@@ -5,8 +5,12 @@ import imutils
 cap = cv2.VideoCapture(0)
 while True:
     ret, image = cap.read()
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
-    mask = cv2.inRange(hsv, (79, 46, 170), (92, 255, 255))
+    hls = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
+#    mask = cv2.inRange(hls, (79, 46, 170), (92, 255, 255))
+    
+#    Ball    #
+    mask = cv2.inRange(hls, (29, 64, 76), (58, 255, 255))
+#    ####    #
     output = cv2.bitwise_and(image, image, mask=mask)
     thresh = cv2.threshold(mask, 225, 255, cv2.THRESH_BINARY_INV)[1]
 
@@ -48,7 +52,7 @@ while True:
     print(cnts)
     cv2.imshow("3255-output", image)
     cv2.imshow("3255-mask", output)
-    k=cv2.waitKey(30) & 0xff
+    k=cv2.waitKey(5)
     if k == 27:
         break
 
