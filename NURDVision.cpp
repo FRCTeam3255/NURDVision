@@ -44,8 +44,8 @@ void processImage(Mat& input, Mat& output){
 
 // Returns true to quit when "ESC" is pressed
 bool quit(){
-	int k = waitKey(5);
-	return (k == 27);
+	char key = (char)waitKey(5);
+	return( key == 27 || key == 'q' || key == 'Q' ); // 'ESC'
 }
 
 int main() {
@@ -55,7 +55,7 @@ int main() {
 	VideoCapture capture(0);
 	
 	cout << "Viewer opened" << endl
-		 << "Press ESC to terminate" << endl;		
+		 << "Press ESC or Q to terminate" << endl;		
 	// While the quit fucntion does not return true run image functions
 	while (!quit()) {
 		//Stores capture to ram mat
