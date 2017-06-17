@@ -1,4 +1,4 @@
-# SuperVision
+# NURDVision
 SuperNURDs implementation of vision co-processing
 
 ## C++ Libraries
