@@ -16,7 +16,7 @@ written by Mike with help from Taylor
 using namespace std;
 using namespace cv;
 
-//Store a double for either upper or lower boundaries of the hsl filter, basically what color youre looking for in the first mask
+//Store a double array for either upper or lower boundaries of the hsl filter, basically what color youre looking for in the first mask
 double Hue[] = { 79, 91 };
 double Saturation[] = { 170, 255 };
 double Luminance[] = { 46, 255 };
@@ -51,33 +51,39 @@ bool quit() {
 
 //main function
 int main() {
-//creates 'mat's to store images
-Mat raw, hsl, bwImage;
-//makes vectors to store contour information
-vector<vector<Point> > contours;
-vector<Vec4i> hierarchy;
-//inports camera feed
-VideoCapture capture(0);
-//while loop to keep the process going
-while (!quit()) {
-//reads camera footage
-capture.read(raw);
-//processes raw footage into hsl filter
-hslImage(raw, hsl);
-//converts our hsl filter into black and white, because findContours requires you to be using black and white, not RGB or HSL
-cvtColor(hsl, bwImage, CV_RGB2GRAY);
-//finds the contours of the image
-findContours(bwImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-//creates mat for the drawing of the contours
-Mat drawing = Mat::zeros(hsl.size(), CV_8UC3);
-for (int i = 0; i< contours.size(); i++)
-{
-	Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-	drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
-}
-//shows the drawn image
-imshow("image", drawing);
-}
-//i dont know why i have this here to be honest
-return 0;
+	//creates 'mat's to store images
+	Mat raw, hsl, bwImage;
+	//makes vectors to store contour information
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	//inports camera feed
+	VideoCapture capture(0);
+	//while loop to keep the process going
+	while (!quit()) {
+		//reads camera footage
+		capture.read(raw);
+		//processes raw footage into hsl filter
+		hslImage(raw, hsl);
+		//converts our hsl filter into black and white, because findContours requires you to be using black and white, not RGB or HSL
+		
+		cvtColor(hsl, bwImage, CV_RGB2GRAY);
+		//finds the contours of the image
+		
+		findContours(bwImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+		
+		//creates mat for the drawing of the contours
+		Mat drawing = Mat::zeros(hsl.size(), CV_8UC3);
+
+		for (int i = 0; i< contours.size(); i++)
+		{
+			Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+			drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
+		}
+
+		//shows the drawn image
+		imshow("image", drawing);
+	}
+	
+	//i dont know why i have this here to be honest
+	return 0;
 }
