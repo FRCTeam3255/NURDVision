@@ -54,15 +54,16 @@ void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &outpu
  	}
 }
 
-double findDistance(){
+double findDistance(vector<vector<Point> > &contoursInput){
+	std::vector<cv::Rect> rects(contoursInput.size());
+	
 	return 0;
 }
 
 // Creates contours
-void createContours(Mat &input, Mat &output){
+void createContours(Mat &input, Mat &output, vector<vector<Point> > &contoursOutput){
 	//makes vectors to store contour information
 	vector<vector<Point> > contoursInput;
-	vector<vector<Point> > contoursOutput;
 	vector<Vec4i> hierarchy;
 	//converts our hsl filter into black and white, because findContours requires you to be using black and white, not RGB or HSL	
 	cvtColor(input, input, CV_RGB2GRAY);
@@ -83,11 +84,12 @@ void createContours(Mat &input, Mat &output){
 
 // Does the image processing
 void processImage(Mat& input, Mat& output){
-	Mat hslOutput, maskOutput, contoursOutput;
+	Mat hslOutput, maskOutput, contoursImageOutput;
+	vector<vector<Point> > contoursValueOutput;
 	hslThreshold(input, Hue, Saturation, Luminance, hslOutput);
 	createMask(input, hslOutput, maskOutput);
-	createContours(maskOutput, contoursOutput);
-	output = contoursOutput;
+	createContours(maskOutput, contoursImageOutput, contoursValueOutput);
+	output = contoursImageOutput;
 }
 
 // Returns true to quit when "ESC" is pressed
