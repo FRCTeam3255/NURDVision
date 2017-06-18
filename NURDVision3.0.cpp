@@ -17,13 +17,6 @@ using namespace std;
 using namespace cv;
 
 //Store a double array for either upper or lower boundaries of the hsl filter, decides what color you're looking for in the first mask
-// ========= Constants for Ball tracking ============//
-// Store an array: [0] = lower bound, [1] = upper bound
-//const double Hue[] = {29.138490103768287, 58.13721981270055};
-//const double Saturation[] = {64.20863309352518, 255.0};
-//const double Luminance[] = {75.67446043165468, 255.0};
-// =================================================//
-
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
 const double Hue[] = {0, 49};
@@ -59,11 +52,22 @@ void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &outpu
  	}
 }
 
-double findDistance(vector<vector<Point> > &contoursInput){
-	std::vector<cv::Rect> rects(contoursInput.size());
-	
-	return 0;
+
+
+// IMPORTED *******
+Point2f centerPoint(cv::Rect rect) {
+	return cv::Point2f(rect.x + (rect.width / 2), rect.y + (rect.height / 2));
 }
+double aimCoords(double pos, double res) {
+		return (pos - (res / 2)) / (res / 2);
+}
+
+Point2f aimCoordsFromPoint(cv::Point2f point, cv::Size res) {
+		return Point2f(aimCoords(point.x, (double)res.width), aimCoords(point.y, (double)res.height));
+}
+
+bool lockAcquired = false;
+// IMPORTED *******
 
 // Creates contours
 void createContours(Mat &input, Mat &output, vector<vector<Point> > &contoursOutput){
@@ -79,10 +83,36 @@ void createContours(Mat &input, Mat &output, vector<vector<Point> > &contoursOut
 	
 	filterContours(contoursInput, contoursOutput);
 	
+//* ************ COPIED ************** *//
+	// Bounding rectangles around contours
+	vector<Rect> rects(contoursOutput.size());
+	vector<RotatedRect> rotRects(contoursOutput.size());	// Rotated bounding rectangles around contours	
+	
+	// Cross hairs
+	line(drawing, Point(drawing.cols / 2, 0), Point(drawing.cols / 2, drawing.rows), (lockAcquired ? Scalar(0, 255, 0) : Scalar(0, 0, 255)), 1);
+	line(drawing, cv::Point(0, drawing.rows / 2), cv::Point(drawing.cols, drawing.rows / 2), (lockAcquired ? Scalar(0, 255, 0) : Scalar(0, 0, 255)), 1);
+//* ************ COPIED ************** *//
+	
 	Scalar color = Scalar(250, 206, 135);
 	for (int i = 0; i< contoursOutput.size(); i++)
 	{
 		drawContours(drawing, contoursOutput, i, color, 2);
+		
+//* ************ COPIED ************** *//
+		// Adds rectangles
+		Rect conRect = boundingRect(contoursOutput[i]);
+		rects[i] = conRect;
+		rotRects[i] = minAreaRect(contoursOutput[i]);
+		rectangle(drawing, conRect, Scalar(255, 255, 0), 2);
+		
+		
+		Point2f aimPoint = aimCoordsFromPoint(centerPoint(conRect), drawing.size());
+		(aimPoint.x < 0.1 && aimPoint.y < 0.1) ? lockAcquired = true : lockAcquired = false;
+		double area = conRect.area();
+		putText(drawing, "Aim: "+ to_string(aimPoint.x) + ", " + to_string(aimPoint.y), centerPoint(conRect), FONT_HERSHEY_PLAIN, 0.8, Scalar(255, 255, 255), 1);
+		putText(drawing, "Area: " + to_string(conRect.area()) + " = " + to_string(conRect.width) + "*" + to_string(conRect.height), centerPoint(conRect) + Point2f(0, 15), cv::FONT_HERSHEY_PLAIN, 0.8, Scalar(255, 255, 255), 1);
+//* ************ COPIED ************** *//
+
 	}
 	output = drawing;
 }
