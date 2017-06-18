@@ -26,7 +26,7 @@ using namespace cuda;
 //const double PIXEL_AREA = 30000; //At 10 inches
 //const double ACTUAL_AREA = 3; //**** NEEDS TO CHANGE ****///
 //const double BASE_DISTANCE = 10;
-//double focalLength = (PIXEL_AREA * BASE_DISTANCE)/ACTUAL_AREA;
+//double FOCAL_LENGTH = (PIXEL_AREA * BASE_DISTANCE)/ACTUAL_AREA;
 // =================================================//
 // ========= Constants for Phone tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
@@ -36,7 +36,7 @@ const double Luminance[] = {255, 255};
 const double PIXEL_AREA = 30000; //At 10 inches
 const double ACTUAL_AREA = 2.5;
 const double BASE_DISTANCE = 10;
-double focalLength = (PIXEL_AREA * BASE_DISTANCE)/ACTUAL_AREA;
+const double FOCAL_LENGTH = (PIXEL_AREA * BASE_DISTANCE)/ACTUAL_AREA;
 // =================================================//
 const Scalar textColor = Scalar(255, 255, 255);
 
@@ -143,8 +143,8 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 			Point2f midPointNormal = findXYOffset(midPoint, output.size()); // Calculate the normalized mid point
 			double targ1Area = targ1.area();
 			double targ2Area = targ2.area();
-			double targ1Distance = (ACTUAL_AREA * focalLength)/targ1Area;
-			double targ2Distance = (ACTUAL_AREA * focalLength)/targ2Area;
+			double targ1Distance = (ACTUAL_AREA * FOCAL_LENGTH)/targ1Area;
+			double targ2Distance = (ACTUAL_AREA * FOCAL_LENGTH)/targ2Area;
 			avgDistance = (targ1Distance+targ2Distance)/2;
 			angle = midPointNormal.x;
 			putText(output, "Angle: "+ to_string(angle), midPoint, cv::FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
