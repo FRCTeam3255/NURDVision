@@ -26,8 +26,8 @@ using namespace cv;
 
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-const double Hue[] = {90, 255};
-const double Saturation[] = {90, 255};
+const double Hue[] = {0, 71};
+const double Saturation[] = {0, 165};
 const double Luminance[] = {245, 255};
 // =================================================//
 
