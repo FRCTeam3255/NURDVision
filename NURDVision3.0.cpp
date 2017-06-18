@@ -3,12 +3,7 @@
 // written by Mike with help from Tayler
 // =======================================================
 
-#include <opencv2/core/utility.hpp>
-#include "opencv2/video/tracking.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/core.hpp"
+#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <stdlib.h>
 
@@ -26,9 +21,9 @@ double Luminance[] = {75.67446043165468, 255.0};
 
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-//double Hue[] = {79, 91};
-//double Saturation[] = {170, 255};
-//double Luminance[] = {46, 255};
+//double Hue[] = {90, 255};
+//double Saturation[] = {90, 255};
+//double Luminance[] = {245, 255};
 // =================================================//
 
 
@@ -45,6 +40,7 @@ void createMask(Mat &input, Mat &mask, Mat &output) {
 	input.copyTo(output, mask);
 }
 
+// Filters out contours 
 void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &output) {
 	output.clear();
 	for (vector<cv::Point> contour : input) {
@@ -52,6 +48,8 @@ void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &outpu
 		output.push_back(contour);
  	}
 }
+
+
 
 // Creates contours
 void createContours(Mat &input, Mat &output){
