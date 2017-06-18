@@ -16,7 +16,7 @@
 using namespace std;
 using namespace cv;
 
-//Store a double array for either upper or lower boundaries of the hsl filter, decides what color you're looking for in the first mask
+//Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
 const double Hue[] = {0, 49};
@@ -73,11 +73,11 @@ Point2f centerPoint(Rect rect) {
 }
 // Finds offset from center point
 double findOffset(double position, double resolution) {
-		return (position - (resolution / 2)) / (resolution / 2);
+	return (position - (resolution / 2)) / (resolution / 2);
 }
 // Finds x and y offsets
 Point2f findXYOffset(Point2f point, Size res) {
-		return Point2f(findOffset(point.x, (double)res.width), findOffset(point.y, (double)res.height));
+	return Point2f(findOffset(point.x, (double)res.width), findOffset(point.y, (double)res.height));
 }
 // Shows crosshairs
 void showCrosshairs(Mat &input){
