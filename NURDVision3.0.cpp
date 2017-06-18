@@ -24,7 +24,14 @@ const double Saturation[] = {0, 70};
 const double Luminance[] = {245, 255};
 const int KNOWN_AREA = 5000; //At 10 inches
 // =================================================//
+double solution;
 bool lockAcquired = false;
+
+struct {
+	bool operator() (cv::Rect a, cv::Rect b) {
+		return b.area() < a.area();
+	}
+} rectSortDesc;
 
 // Converts image to hsl filter, filtering out any color besides retroreflective tapes
 void hslThreshold(Mat &input, const double hue[], const double sat[], const double lum[], Mat &output) {
@@ -88,12 +95,12 @@ void showCrosshairs(Mat &input){
 // Finds targets
 void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){	
 	output = Mat::zeros(imageInput.size(), CV_8UC3);
+	// Creates Bounding Boxes //
+	// Bounding rectangles around contours
+	vector<Rect> rects(input.size());
+	// Rotated bounding rectangles around contours
+	vector<RotatedRect> rotRects(input.size());
 	for (int i = 0; i< input.size(); i++) {
-		// Creates Bounding Boxes //
-		// Bounding rectangles around contours
-		vector<Rect> rects(input.size());
-		// Rotated bounding rectangles around contours
-		vector<RotatedRect> rotRects(input.size());
 		// Adds rectangles
 		Rect conRect = boundingRect(input[i]);
 		rects[i] = conRect;
@@ -116,10 +123,39 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 		double distance = (area/KNOWN_AREA)*10;
 		putText(output, "Angle X: "+ to_string(offset.x), centerPoint(conRect), FONT_HERSHEY_PLAIN, 1, textColor, 1);
 		putText(output, "Angle Y: "+ to_string(offset.y), centerPoint(conRect) + Point2f(0, 15), FONT_HERSHEY_PLAIN, 1, textColor, 1);
-		putText(output, "Distance: " + to_string(distance), centerPoint(conRect) + Point2f(0, 30), FONT_HERSHEY_PLAIN, 1, textColor, 1);
+		putText(output, "Distance: " + to_string(distance), centerPoint(conRect) + Point2f(0, 30), FONT_HERSHEY_PLAIN, 1, textColor, 1);	
+	}
+	if (rects.size() >= 2) {
+		sort(rects.begin(), rects.end(), rectSortDesc); // Sort rectangles in descending order based on their area.
+
+		// Pick out two largest targets - these will most likely be what we're looking for (Note to reader: I hate assumptions)
+		cv::Rect targ1 = rects[0];
+		cv::Rect targ2 = rects[1];
+
+		// TODO: Calculate rectangle to encapsulate entire target...
+
+		cv::Point2f cPoint1 = centerPoint(targ1);	// Calculate center point of both targets...
+		cv::Point2f cPoint2 = centerPoint(targ2);
+
+		cv::Point2f midPoint((cPoint1.x + cPoint2.x) / 2, (cPoint1.y + cPoint2.y) / 2); // Calculate mid points between centers of rects
+		cv::Point2f tl(midPoint.x - 2, midPoint.y - 2);	// Calculate top-left point of center dot
+		cv::Point2f tr(midPoint.x + 2, midPoint.y + 2); // Calculate bottom right point of center dot
+
+		double t1Width = targ1.width;
+		double t1Height = targ1.height;
+
+		double t2Width = targ2.width;
+		double t2Height = targ2.height;
+
+		cv::line(output, cPoint1, cPoint2, cv::Scalar(0, 0, 255), 1); // Draw a line between center point of vision targets
+		cv::rectangle(output, tl, tr, cv::Scalar(255, 0, 0), 3); // Draw a point at center of line drawn above
+
+		cv::Point2f midPointNormal = findXYOffset(midPoint, output.size()); // Calculate the normalized mid point
+		cv::putText(output, "Mid: "+ to_string(midPointNormal.x) + ", " + to_string(midPointNormal.y), midPoint, cv::FONT_HERSHEY_PLAIN, 0.8, cv::Scalar(255, 255, 255), 1);
+
+		solution = midPointNormal.x; // Calculate a solution for turning the robot. This value will ultimately be plugged into a PID loop with inputs of -1 to 1 controlling the rotation rate of the robot.
 	}
 }
-
 // Does the image processing
 void processImage(Mat& input, Mat& output){
 	Mat hslOutput, maskOutput, contoursImageOutput, targetsOutput;
