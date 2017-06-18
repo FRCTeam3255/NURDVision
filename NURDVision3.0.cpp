@@ -6,7 +6,7 @@
 #include <opencv2/opencv.hpp>
 
 // ****** CUDA ******* //
-//#include <opencv2/gpu/gpu.hpp>
+//#include <opencv2/cudaarithm.hpp>
 // ****** CUDA ******* //
 
 #include <iostream>
@@ -15,6 +15,7 @@
 //to my understanding 'namespaces' are used basically before each command, so 'createMask' is actually cv::createMask, and RNG is std::RNG
 using namespace std;
 using namespace cv;
+using namespace cuda;
 
 //Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
@@ -24,8 +25,7 @@ const double Saturation[] = {0, 70};
 const double Luminance[] = {245, 255};
 const int KNOWN_AREA = 5000; //At 10 inches
 // =================================================//
-double solution;
-bool lockAcquired = false;
+const Scalar textColor = Scalar(255, 255, 255);
 
 struct {
 	bool operator() (cv::Rect a, cv::Rect b) {
@@ -88,83 +88,72 @@ Point2f findXYOffset(Point2f point, Size res) {
 }
 // Shows crosshairs
 void showCrosshairs(Mat &input){
-	line(input, Point(input.cols / 2, 0), Point(input.cols / 2, input.rows), (lockAcquired ? Scalar(0, 255, 0) : Scalar(0, 0, 255)), 1);
-	line(input, Point(0, input.rows / 2), Point(input.cols, input.rows / 2), (lockAcquired ? Scalar(0, 255, 0) : Scalar(0, 0, 255)), 1);
+	line(input, Point(input.cols / 2, 0), Point(input.cols / 2, input.rows), Scalar(0, 0, 255), 1);
+	line(input, Point(0, input.rows / 2), Point(input.cols, input.rows / 2), Scalar(0, 0, 255), 1);
 }
 
 // Finds targets
-void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){	
+void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, double &avgDistance, double &angle){	
 	output = Mat::zeros(imageInput.size(), CV_8UC3);
 	// Creates Bounding Boxes //
-	// Bounding rectangles around contours
 	vector<Rect> rects(input.size());
-	// Rotated bounding rectangles around contours
-	vector<RotatedRect> rotRects(input.size());
+	
 	for (int i = 0; i< input.size(); i++) {
 		// Adds rectangles
 		Rect conRect = boundingRect(input[i]);
 		rects[i] = conRect;
-		rotRects[i] = minAreaRect(input[i]);
 		
 		Scalar contourColor = Scalar(250, 206, 135);
-		Scalar rectangleColor = Scalar(255, 255, 0);
 		drawContours(output, input, i, contourColor, 2);
-		rectangle(output, conRect, rectangleColor, 2);
-		
-		// Creates aimPoints
-		Point2f offset = findXYOffset(centerPoint(conRect), output.size());
-		
-		// Changes lockAcquired if the target is locked on
-		(-0.1 < offset.x < 0.1 && -0.1 < offset.y < 0.1) ? lockAcquired = true : lockAcquired = false; //TODO: Do better target aquition
-		
-		Scalar textColor = Scalar(255, 255, 255);
-		
-		double area = conRect.area();
-		double distance = (area/KNOWN_AREA)*10;
-		putText(output, "Angle X: "+ to_string(offset.x), centerPoint(conRect), FONT_HERSHEY_PLAIN, 1, textColor, 1);
-		putText(output, "Angle Y: "+ to_string(offset.y), centerPoint(conRect) + Point2f(0, 15), FONT_HERSHEY_PLAIN, 1, textColor, 1);
-		putText(output, "Distance: " + to_string(distance), centerPoint(conRect) + Point2f(0, 30), FONT_HERSHEY_PLAIN, 1, textColor, 1);	
 	}
 	if (rects.size() >= 2) {
-		sort(rects.begin(), rects.end(), rectSortDesc); // Sort rectangles in descending order based on their area.
+			sort(rects.begin(), rects.end(), rectSortDesc); // Sort rectangles in descending order based on their area.
 
-		// Pick out two largest targets - these will most likely be what we're looking for (Note to reader: I hate assumptions)
-		cv::Rect targ1 = rects[0];
-		cv::Rect targ2 = rects[1];
+			// Pick out two largest targets - these will most likely be what we're looking for (Note to reader: I hate assumptions)
+			Rect targ1 = rects[0];
+			Rect targ2 = rects[1];
+			Scalar rectangleColor = Scalar(255, 255, 0);
+			
+			rectangle(output, targ1, rectangleColor, 2);
+			rectangle(output, targ2, rectangleColor, 2);
+			
+			Point2f cPoint1 = centerPoint(targ1);	// Calculate center point of both targets...
+			Point2f cPoint2 = centerPoint(targ2);
 
-		// TODO: Calculate rectangle to encapsulate entire target...
-
-		cv::Point2f cPoint1 = centerPoint(targ1);	// Calculate center point of both targets...
-		cv::Point2f cPoint2 = centerPoint(targ2);
-
-		cv::Point2f midPoint((cPoint1.x + cPoint2.x) / 2, (cPoint1.y + cPoint2.y) / 2); // Calculate mid points between centers of rects
-		cv::Point2f tl(midPoint.x - 2, midPoint.y - 2);	// Calculate top-left point of center dot
-		cv::Point2f tr(midPoint.x + 2, midPoint.y + 2); // Calculate bottom right point of center dot
-
-		double t1Width = targ1.width;
-		double t1Height = targ1.height;
-
-		double t2Width = targ2.width;
-		double t2Height = targ2.height;
-
-		cv::line(output, cPoint1, cPoint2, cv::Scalar(0, 0, 255), 1); // Draw a line between center point of vision targets
-		cv::rectangle(output, tl, tr, cv::Scalar(255, 0, 0), 3); // Draw a point at center of line drawn above
-
-		cv::Point2f midPointNormal = findXYOffset(midPoint, output.size()); // Calculate the normalized mid point
-		cv::putText(output, "Mid: "+ to_string(midPointNormal.x) + ", " + to_string(midPointNormal.y), midPoint, cv::FONT_HERSHEY_PLAIN, 0.8, cv::Scalar(255, 255, 255), 1);
-
-		solution = midPointNormal.x; // Calculate a solution for turning the robot. This value will ultimately be plugged into a PID loop with inputs of -1 to 1 controlling the rotation rate of the robot.
+			Point2f midPoint((cPoint1.x + cPoint2.x) / 2, (cPoint1.y + cPoint2.y) / 2); // Calculate mid points between centers of rects
+			Point2f tl(midPoint.x - 2, midPoint.y - 2);	// Calculate top-left point of center dot
+			Point2f tr(midPoint.x + 2, midPoint.y + 2); // Calculate bottom right point of center dot
+			
+			line(output, cPoint1, cPoint2, Scalar(0, 0, 255), 1); // Draw a line between center point of vision targets
+			rectangle(output, tl, tr, Scalar(255, 0, 0), 3); // Draw a point at center of line drawn above
+			
+			Point2f midPointNormal = findXYOffset(midPoint, output.size()); // Calculate the normalized mid point
+			double targ1Area = targ1.area();
+			double targ2Area = targ2.area();
+			double targ1Distance = (targ1Area/KNOWN_AREA)*10;
+			double targ2Distance = (targ2Area/KNOWN_AREA)*10;
+			avgDistance = (targ1Distance+targ2Distance)/2;
+			angle = midPointNormal.x;
+			putText(output, "Angle: "+ to_string(angle), midPoint, cv::FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
+			putText(output, "Distance Target 1: "+ to_string(targ1Distance), midPoint + Point2f(0,15), FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
+			putText(output, "Distance Target 2: "+ to_string(targ2Distance), midPoint + Point2f(0,30), FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
+			putText(output, "Avg Distance: "+ to_string(avgDistance), midPoint + Point2f(0,45), FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
 	}
+	
 }
 // Does the image processing
-void processImage(Mat& input, Mat& output){
+void processImage(Mat& input, Mat& output, double &distance, double &angle){
+	//Mats for processed outputs
 	Mat hslOutput, maskOutput, contoursImageOutput, targetsOutput;
-	vector<vector<Point> > contoursValueOutput;
-	
 	hslThreshold(input, Hue, Saturation, Luminance, hslOutput);
 	createMask(input, hslOutput, maskOutput);
+	
+	// Vector for storing contour values
+	vector<vector<Point> > contoursValueOutput;
 	createContours(maskOutput, contoursValueOutput);
-	findTargets(maskOutput, contoursValueOutput, targetsOutput);
+
+	Rect tape1Pos, tape2Pos;	
+	findTargets(maskOutput, contoursValueOutput, targetsOutput, distance, angle);
 	output = targetsOutput;
 	showCrosshairs(output);
 }
@@ -176,9 +165,11 @@ bool quit(){
 }
 
 int main() {
+	double distance = 0.0;
+	double angle = 0.0;
 	
 	// ****** CUDA ******* //
-//	gpu::setDevice(0);
+//	setDevice(0);
 	// ****** CUDA ******* //
 	
 	//Creates mats for storing image
@@ -193,7 +184,8 @@ int main() {
 		//Stores capture to ram mat
 		capture.read(raw);
 		//Runs image processing - give mats raw and proccessed
-		processImage(raw, processed);
+		processImage(raw, processed, distance, angle);
+		cout << "Distance: "<< distance << "    Angle: " << angle << endl;
 		// show processed image
 		imshow("Processed image", processed);
 	}
