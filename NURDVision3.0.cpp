@@ -23,7 +23,7 @@ using namespace cuda;
 const double Hue[] = {0, 49};
 const double Saturation[] = {0, 70};
 const double Luminance[] = {245, 255};
-const int KNOWN_AREA = 5000; //At 10 inches
+const int KNOWN_AREA = 30000; //At 10 inches
 // =================================================//
 const Scalar textColor = Scalar(255, 255, 255);
 
