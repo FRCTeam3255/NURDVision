@@ -19,16 +19,16 @@ using namespace cv;
 //Store a double array for either upper or lower boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Ball tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-//double Hue[] = {29.138490103768287, 58.13721981270055};
-//double Saturation[] = {64.20863309352518, 255.0};
-//double Luminance[] = {75.67446043165468, 255.0};
+double Hue[] = {29.138490103768287, 58.13721981270055};
+double Saturation[] = {64.20863309352518, 255.0};
+double Luminance[] = {75.67446043165468, 255.0};
 // =================================================//
 
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-double Hue[] = {79, 91};
-double Saturation[] = {170, 255};
-double Luminance[] = {46, 255};
+//double Hue[] = {79, 91};
+//double Saturation[] = {170, 255};
+//double Luminance[] = {46, 255};
 // =================================================//
 
 
@@ -45,24 +45,33 @@ void createMask(Mat &input, Mat &mask, Mat &output) {
 	input.copyTo(output, mask);
 }
 
+void filterContours(vector<vector<Point>> &input, vector<vector<Point> > &output) {
+	output.clear();
+	for (vector<cv::Point> contour : input) {
+		if (arcLength(contour, true) < 100) continue;
+		output.push_back(contour);
+ 	}
+}
+
 // Creates contours
 void createContours(Mat &input, Mat &output){
-	//Generates random number 1,2,3,4, or 5
-	RNG rng(12345);
 	//makes vectors to store contour information
-	vector<vector<Point> > contours;
+	vector<vector<Point> > contoursInput;
+	vector<vector<Point> > contoursOutput;
 	vector<Vec4i> hierarchy;
 	//converts our hsl filter into black and white, because findContours requires you to be using black and white, not RGB or HSL	
 	cvtColor(input, input, CV_RGB2GRAY);
 	//finds the contours of the image
-	findContours(input, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+	findContours(input, contoursInput, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 	//creates mat for the drawing of the contours
 	Mat drawing = Mat::zeros(input.size(), CV_8UC3);
-
-	for (int i = 0; i< contours.size(); i++)
+	
+	filterContours(contoursInput, contoursOutput);
+	
+	Scalar color = Scalar(250, 206, 135);
+	for (int i = 0; i< contoursOutput.size(); i++)
 	{
-		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
+		drawContours(drawing, contoursOutput, i, color, 2);
 	}
 	output = drawing;
 }
