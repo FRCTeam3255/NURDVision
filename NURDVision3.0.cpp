@@ -24,7 +24,6 @@ const double Saturation[] = {0, 70};
 const double Luminance[] = {245, 255};
 // =================================================//
 
-
 // Converts image to hsl filter, filtering out any color besides retroreflective tapes
 void hslThreshold(Mat &input, const double hue[], const double sat[], const double lum[], Mat &output) {
 	cvtColor(input, output, COLOR_BGR2HLS);
@@ -65,8 +64,6 @@ double aimCoords(double pos, double res) {
 Point2f aimCoordsFromPoint(cv::Point2f point, cv::Size res) {
 		return Point2f(aimCoords(point.x, (double)res.width), aimCoords(point.y, (double)res.height));
 }
-
-bool lockAcquired = false;
 // IMPORTED *******
 
 // Creates contours
@@ -83,15 +80,6 @@ void createContours(Mat &input, Mat &output, vector<vector<Point> > &contoursOut
 	
 	filterContours(contoursInput, contoursOutput);
 	
-//* ************ COPIED ************** *//
-	// Bounding rectangles around contours
-	vector<Rect> rects(contoursOutput.size());
-	vector<RotatedRect> rotRects(contoursOutput.size());	// Rotated bounding rectangles around contours	
-	
-	// Cross hairs
-	line(drawing, Point(drawing.cols / 2, 0), Point(drawing.cols / 2, drawing.rows), (lockAcquired ? Scalar(0, 255, 0) : Scalar(0, 0, 255)), 1);
-	line(drawing, cv::Point(0, drawing.rows / 2), cv::Point(drawing.cols, drawing.rows / 2), (lockAcquired ? Scalar(0, 255, 0) : Scalar(0, 0, 255)), 1);
-//* ************ COPIED ************** *//
 	
 	Scalar color = Scalar(250, 206, 135);
 	for (int i = 0; i< contoursOutput.size(); i++)
@@ -100,17 +88,10 @@ void createContours(Mat &input, Mat &output, vector<vector<Point> > &contoursOut
 		
 //* ************ COPIED ************** *//
 		// Adds rectangles
-		Rect conRect = boundingRect(contoursOutput[i]);
 		rects[i] = conRect;
-		rotRects[i] = minAreaRect(contoursOutput[i]);
-		rectangle(drawing, conRect, Scalar(255, 255, 0), 2);
 		
 		
-		Point2f aimPoint = aimCoordsFromPoint(centerPoint(conRect), drawing.size());
-		(aimPoint.x < 0.1 && aimPoint.y < 0.1) ? lockAcquired = true : lockAcquired = false;
 		double area = conRect.area();
-		putText(drawing, "Aim: "+ to_string(aimPoint.x) + ", " + to_string(aimPoint.y), centerPoint(conRect), FONT_HERSHEY_PLAIN, 0.8, Scalar(255, 255, 255), 1);
-		putText(drawing, "Area: " + to_string(conRect.area()) + " = " + to_string(conRect.width) + "*" + to_string(conRect.height), centerPoint(conRect) + Point2f(0, 15), cv::FONT_HERSHEY_PLAIN, 0.8, Scalar(255, 255, 255), 1);
 //* ************ COPIED ************** *//
 
 	}
@@ -119,12 +100,10 @@ void createContours(Mat &input, Mat &output, vector<vector<Point> > &contoursOut
 
 // Does the image processing
 void processImage(Mat& input, Mat& output){
-	Mat hslOutput, maskOutput, contoursImageOutput;
 	vector<vector<Point> > contoursValueOutput;
 	hslThreshold(input, Hue, Saturation, Luminance, hslOutput);
 	createMask(input, hslOutput, maskOutput);
 	createContours(maskOutput, contoursImageOutput, contoursValueOutput);
-	output = contoursImageOutput;
 }
 
 // Returns true to quit when "ESC" is pressed
