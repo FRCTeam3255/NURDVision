@@ -19,16 +19,16 @@ using namespace cv;
 //Store a double array for either upper or lower boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Ball tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-const double Hue[] = {29.138490103768287, 58.13721981270055};
-const double Saturation[] = {64.20863309352518, 255.0};
-const double Luminance[] = {75.67446043165468, 255.0};
+//const double Hue[] = {29.138490103768287, 58.13721981270055};
+//const double Saturation[] = {64.20863309352518, 255.0};
+//const double Luminance[] = {75.67446043165468, 255.0};
 // =================================================//
 
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-//const double Hue[] = {90, 255};
-//const double Saturation[] = {90, 255};
-//const double Luminance[] = {245, 255};
+const double Hue[] = {90, 255};
+const double Saturation[] = {90, 255};
+const double Luminance[] = {245, 255};
 // =================================================//
 
 
@@ -55,7 +55,7 @@ void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &outpu
 }
 
 double findDistance(){
-	
+	return 0;
 }
 
 // Creates contours
