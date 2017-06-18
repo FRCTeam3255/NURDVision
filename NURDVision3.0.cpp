@@ -6,7 +6,7 @@
 #include <opencv2/opencv.hpp>
 
 // ****** CUDA ******* //
-#include <opencv2/gpu/gpu.hpp>
+//#include <opencv2/gpu/gpu.hpp>
 // ****** CUDA ******* //
 
 #include <iostream>
@@ -19,21 +19,21 @@ using namespace cv;
 //Store a double array for either upper or lower boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Ball tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-double Hue[] = {29.138490103768287, 58.13721981270055};
-double Saturation[] = {64.20863309352518, 255.0};
-double Luminance[] = {75.67446043165468, 255.0};
+const double Hue[] = {29.138490103768287, 58.13721981270055};
+const double Saturation[] = {64.20863309352518, 255.0};
+const double Luminance[] = {75.67446043165468, 255.0};
 // =================================================//
 
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-//double Hue[] = {90, 255};
-//double Saturation[] = {90, 255};
-//double Luminance[] = {245, 255};
+//const double Hue[] = {90, 255};
+//const double Saturation[] = {90, 255};
+//const double Luminance[] = {245, 255};
 // =================================================//
 
 
 // Converts image to hsl filter, filtering out any color besides retroreflective tapes
-void hslThreshold(Mat &input, double hue[], double sat[], double lum[], Mat &output) {
+void hslThreshold(Mat &input, const double hue[], const double sat[], const double lum[], Mat &output) {
 	cvtColor(input, output, COLOR_BGR2HLS);
 	inRange(output, Scalar(hue[0], lum[0], sat[0]), Scalar(hue[1], lum[1], sat[1]), output);
 }
@@ -54,7 +54,9 @@ void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &outpu
  	}
 }
 
-
+double findDistance(){
+	
+}
 
 // Creates contours
 void createContours(Mat &input, Mat &output){
@@ -97,7 +99,7 @@ bool quit(){
 int main() {
 	
 	// ****** CUDA ******* //
-	gpu::setDevice(0);
+//	gpu::setDevice(0);
 	// ****** CUDA ******* //
 	
 	//Creates mats for storing image
