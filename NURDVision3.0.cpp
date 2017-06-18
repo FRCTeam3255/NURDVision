@@ -26,8 +26,8 @@ using namespace cv;
 
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-const double Hue[] = {0, 71};
-const double Saturation[] = {0, 165};
+const double Hue[] = {0, 49};
+const double Saturation[] = {0, 70};
 const double Luminance[] = {245, 255};
 // =================================================//
 
@@ -49,6 +49,11 @@ void createMask(Mat &input, Mat &mask, Mat &output) {
 void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &output) {
 	output.clear();
 	for (vector<cv::Point> contour : input) {
+		cv::Rect bb = boundingRect(contour);
+		if (bb.width < 6 || bb.width > 1000000) continue;
+		if (bb.height < 6 || bb.height > 1000000) continue;
+		double area = contourArea(contour);
+		if (area < 50) continue;
 		if (arcLength(contour, true) < 100) continue;
 		output.push_back(contour);
  	}
