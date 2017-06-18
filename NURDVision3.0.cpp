@@ -4,6 +4,11 @@
 // =======================================================
 
 #include <opencv2/opencv.hpp>
+
+// ****** CUDA ******* //
+#include <opencv2/gpu/gpu.hpp>
+// ****** CUDA ******* //
+
 #include <iostream>
 #include <stdlib.h>
 
@@ -90,6 +95,11 @@ bool quit(){
 }
 
 int main() {
+	
+	// ****** CUDA ******* //
+	gpu::setDevice(0);
+	// ****** CUDA ******* //
+	
 	//Creates mats for storing image
 	Mat raw, processed;
 	//Starts video capture of camera 0;
