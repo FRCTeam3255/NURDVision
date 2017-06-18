@@ -34,9 +34,9 @@ double Luminance[] = {75.67446043165468, 255.0};
 
 // Converts image to hsl filter, filtering out any color besides retroreflective tapes
 void hslThreshold(Mat &input, double hue[], double sat[], double lum[], Mat &output) {
-		cvtColor(input, output, COLOR_BGR2HLS);
-		inRange(output, Scalar(hue[0], lum[0], sat[0]), Scalar(hue[1], lum[1], sat[1]), output);
-	}
+	cvtColor(input, output, COLOR_BGR2HLS);
+	inRange(output, Scalar(hue[0], lum[0], sat[0]), Scalar(hue[1], lum[1], sat[1]), output);
+}
 
 // Creates a workable mask to a mat, so we can process the hsl filter
 void createMask(Mat &input, Mat &mask, Mat &output) {
@@ -45,7 +45,7 @@ void createMask(Mat &input, Mat &mask, Mat &output) {
 	input.copyTo(output, mask);
 }
 
-void filterContours(vector<vector<Point>> &input, vector<vector<Point> > &output) {
+void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &output) {
 	output.clear();
 	for (vector<cv::Point> contour : input) {
 		if (arcLength(contour, true) < 100) continue;
