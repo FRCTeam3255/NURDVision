@@ -20,10 +20,23 @@ using namespace cuda;
 //Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-const double Hue[] = {0, 49};
-const double Saturation[] = {0, 70};
-const double Luminance[] = {245, 255};
-const int KNOWN_AREA = 30000; //At 10 inches
+//const double Hue[] = {0, 49};
+//const double Saturation[] = {0, 70};
+//const double Luminance[] = {245, 255};
+//const double PIXEL_AREA = 30000; //At 10 inches
+//const double ACTUAL_AREA = 3; //**** NEEDS TO CHANGE ****///
+//const double BASE_DISTANCE = 10;
+//double focalLength = (PIXEL_AREA * BASE_DISTANCE)/ACTUAL_AREA;
+// =================================================//
+// ========= Constants for Phone tracking ============//
+// Store an array: [0] = lower bound, [1] = upper bound
+const double Hue[] = {0, 0};
+const double Saturation[] = {0, 0};
+const double Luminance[] = {255, 255};
+const double PIXEL_AREA = 30000; //At 10 inches
+const double ACTUAL_AREA = 2.5;
+const double BASE_DISTANCE = 10;
+double focalLength = (PIXEL_AREA * BASE_DISTANCE)/ACTUAL_AREA;
 // =================================================//
 const Scalar textColor = Scalar(255, 255, 255);
 
@@ -109,7 +122,7 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 	if (rects.size() >= 2) {
 			sort(rects.begin(), rects.end(), rectSortDesc); // Sort rectangles in descending order based on their area.
 
-			// Pick out two largest targets - these will most likely be what we're looking for (Note to reader: I hate assumptions)
+			// Pick out two largest targets - these will most likely be what we're looking for.
 			Rect targ1 = rects[0];
 			Rect targ2 = rects[1];
 			Scalar rectangleColor = Scalar(255, 255, 0);
@@ -130,11 +143,12 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 			Point2f midPointNormal = findXYOffset(midPoint, output.size()); // Calculate the normalized mid point
 			double targ1Area = targ1.area();
 			double targ2Area = targ2.area();
-			double targ1Distance = (targ1Area/KNOWN_AREA)*10;
-			double targ2Distance = (targ2Area/KNOWN_AREA)*10;
+			double targ1Distance = (ACTUAL_AREA * focalLength)/targ1Area;
+			double targ2Distance = (ACTUAL_AREA * focalLength)/targ2Area;
 			avgDistance = (targ1Distance+targ2Distance)/2;
 			angle = midPointNormal.x;
 			putText(output, "Angle: "+ to_string(angle), midPoint, cv::FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
+			putText(output, "Area: "+ to_string(targ1Area), midPoint + Point2f(0,-15), FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
 			putText(output, "Distance Target 1: "+ to_string(targ1Distance), midPoint + Point2f(0,15), FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
 			putText(output, "Distance Target 2: "+ to_string(targ2Distance), midPoint + Point2f(0,30), FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
 			putText(output, "Avg Distance: "+ to_string(avgDistance), midPoint + Point2f(0,45), FONT_HERSHEY_PLAIN, 0.8, textColor, 1);
