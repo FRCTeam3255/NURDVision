@@ -5,6 +5,9 @@ A public (cleaned up) version will be available shortly
 
 Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
 
+### TO DO:
+(Maybe) Have HSL constants get data from robotPreferences or main code
+
 ## How to Set Up on the Jetson TK1
 What you will need: a Jetson TK1, the provided Micro USB cable, a PC running UBUNTU 64 bit, a monitor or TV (or advanced SSH knoledge), ethernet access, a mouse and keyboard with a USB splitter, a webcam(works best with an LED ring), and the provided 12v power supply
 
