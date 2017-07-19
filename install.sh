@@ -47,6 +47,8 @@ make -j4
 sudo make install
 #OPENCV SETUP DONE
 
+echo "$(tput bold)$(tput setaf 2)OpenCV setup complete"
+
 #SETUP OUR CODE
 cd
 cd ~/Desktop
@@ -59,6 +61,8 @@ g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d
 cd
 rm ./.bash_aliases
 wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
+
+echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
 
 
 
