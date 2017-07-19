@@ -55,7 +55,9 @@ g++ NURDVision3.0.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_feature
 #CODE SETUP DONE
 
 #alias setup
-cd wget https://github.com/FRCTeam3255/NURDVision/blob/master/.bash_aliases
+cd
+rm ./.bash_aliases
+wget https://github.com/FRCTeam3255/NURDVision/blob/master/.bash_aliases
 
 
 
