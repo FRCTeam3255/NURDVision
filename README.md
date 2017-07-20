@@ -16,60 +16,61 @@ What you will need: a Jetson TK1, the provided Micro USB cable, a PC running UBU
 
 ### Jetson initial setup and flashing:
 
-Step 1: Plug micro usb cable into the jetson (small side into the port next to audio jacks, and the large side into your PC running UBUNTU).
+__Step 1__: Plug micro usb cable into the jetson (small side into the port next to audio jacks, and the large side into your PC running UBUNTU).
 
-Step 3: Plug in TV, webcam, ethernet and Mouse/Keyboard to jetson
+__Step 2__: Plug in TV, webcam, ethernet and Mouse/Keyboard to jetson
 
-Step 4: Turn jetson into recovery mode by holding down the recovery button and pressing restart (if the jetson is on already) or power off (if the jetson is off)
+__Step 3__: Turn jetson into recovery mode by holding down the recovery button and pressing restart (if the jetson is on already) or power off (if the jetson is off)
 
-Step 5: Open up console (terminal) on your LINUX computer
+__Step 4__: Open up console (terminal) on your LINUX computer
 
-Step 6: Type lsusb into the ubuntu PC's console and check to make sure that there is a NVidia device plugged in
+__Step 5__: Type lsusb into the ubuntu PC's console and check to make sure that there is a NVidia device plugged in
 
-Step 7: Download flashJetson.run Type: 
+__Step 6__: Download flashJetson.run Type: 
 	
 	 mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
 
-Step 8: Continue through the user intuitive flashing process (this may take a few hours) selecting Jetson Tk1 where available
+__Step 7__: Continue through the user intuitive flashing process (this may take a few hours) selecting Jetson Tk1 where available
 
-Follow the on screen steps. _**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
+Follow the on screen steps. 
+
+_**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
 
 It should say flash succesfull.
 
 ~~You may be asked to enter an ip address. On the jetson type: `ifconfig` then type result inte addr: (example 192.168.0.0) into the prompt on your LINUX computer. Click continue.~~
 
-Jetson intial setup complete!
+_Jetson intial setup complete!_
 
 ### Jetson NURDVision installation: 
 A PC is no longer needed as this work is done on the jetson
 
-(alterantively can be done by ssh by typing: ssh ubuntu@(IP-ADDRESS-FOUND-IN-IFCONFIG) password:ubuntu and typing commands there instead)
+(alterantively can be done by ssh by typing: ssh ubuntu@tegra-ubuntu password:ubuntu and typing commands there instead)
 
-Step 1: download install.sh to jetson. Type: 
+__Step 1__: download install.sh to jetson. Type: 
 	
 	wget https://github.com/FRCTeam3255/NURDVision/raw/master/install.sh; bash ./install.sh
 
 (this may take a few hours)
 
-Step 2: once complete you can now download the latest code, compile and run it, type:
+__Step 2__: once complete you can now download the latest code, compile and run it, type:
 
 	nurdall
 
-Jetson NURDVision installation complete!
+_Jetson NURDVision installation complete!_
 
 ### Custom command info: 	
 
-		nurdget 		downloads latest NURDVision from github
-		nurdcompile		compliles NURDVision as runNURDVision
-		nurdrun			runs runNURDVision
-		nurdrun	-debug	runs runNURDVision with viewer
+	nurdget 		downloads latest NURDVision from github
+	nurdcompile		compliles NURDVision as runNURDVision
+	nurdrun			runs runNURDVision
+	nurdrun	-debug		runs runNURDVision with viewer
 		
-		nurdall			runs nurdget, nurdcompile, and nurdrun -debug;
-		These commands can be run invidually if needed (i.e. only nurdcompile and nurdrun if disconnected from internet)
-		
+	nurdall			runs nurdget, nurdcompile, and nurdrun -debug;
+
+These commands can be run invidually if needed (i.e. only nurdcompile and nurdrun if disconnected from internet)
 
 Any questions contact Mike at the SuperNURDs
-
 
 ### Additional info:
 #### C++ Compiler arguments (nurdcompile)
