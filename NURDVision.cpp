@@ -205,8 +205,7 @@ bool quit(){
 	return( key == 27 || key == 'q' || key == 'Q' ); // key 27 = 'ESC'
 }
 
-int main() {
-	
+int main( int argc, char *argv[] ) {
 	// Initalizes distance and angle to 0.0;
 	double distance = 0.0;
 	double angle = 0.0;
@@ -227,7 +226,7 @@ int main() {
 		processImage(raw, processed, distance, angle);
 		cout << "Distance: "<< distance << "    Angle: " << angle << endl;
 		// Display processed image
-		imshow("Processed image", processed);
+		if(argc > 1)if(string(argv[1]) == "-debug")imshow("Processed image", processed);
 	}
 	
 	cout << "Viewer closed successfully";

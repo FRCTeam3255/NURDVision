@@ -21,6 +21,7 @@ sudo apt-get -y install libglew1.6-dev
 # GTK development libraries (to allow creating graphical windows)
 sudo apt-get -y install libgtk2.0-dev
 
+#OPENCV SETUP
 cd ~/Downloads
 rm 3.2.0.zip
 wget https://github.com/opencv/opencv/archive/3.2.0.zip
@@ -61,6 +62,7 @@ g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d
 cd
 rm ./.bash_aliases
 wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
+source ~/.bash_aliases
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
 

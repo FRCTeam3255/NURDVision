@@ -24,16 +24,20 @@ Step 4: type lsusb into the ubuntu PC's console and check to make sure that ther
 
 Step 5: Download flashJetson.run Type: 
 	
-	wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
+	 mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
 
 Step 6: roll through the user intuitive flash process (this may take a few hours) selecting Jetson Tk1 where available
-Follow the on screen steps. It should say flash succesfull
+
+Follow the on screen steps. _**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
+
+It should say flash succesfull.
+
 You may be asked to enter an ip address on the jetson type: ifconfig then type inte addr: (example 192.168.0.0) you see into the prompt on your computer click continue.
 
 ### Jetson NURDVision installation: 
 A PC is no longer needed as this work is done on the jetson
 
-(alterantively can be done by ssh by typing: ssh ubuntu@(IP_ADDRESS_FOUND_IN_IFCONFIG) password:ubuntu and typing commands there instead)
+(alterantively can be done by ssh by typing: ssh ubuntu@(IP-ADDRESS-FOUND-IN-IFCONFIG) password:ubuntu and typing commands there instead)
 
 Step 1: download install.sh to jetson. Type: 
 	
@@ -41,18 +45,20 @@ Step 1: download install.sh to jetson. Type:
 
 (this may take a few hours)
 
-Step 2: once complete type 'nurdall' into the jetsons terminal and you're all set
+Step 2: once complete you can now download the latest code, compile and run it, type:
+
+	nurdall
+
 Note: 	nurdget - downloads NURDVision from github
 		nurdcompile - compliles NURDVision as runNURDVision
 		nurdrun - runs runNURDVision
 		nurdall - runs nurdget; nurdcompile; nurdrun;
+		These commands can be run invidually if needed (i.e. only nurdcompile and nurdrun if disconnected from internet)
+		
 
 Any questions contact Mike at the SuperNURDs
 
 
 ### Additional info:
-#### C++ Libraries
-	-lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab
-
-#### C++ Compiler arguments
-	g++ NURDVision3.0.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -o runNURDVision
+#### C++ Compiler arguments (nurdcompile)
+	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -o runNURDVision
