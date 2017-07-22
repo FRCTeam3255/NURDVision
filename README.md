@@ -10,6 +10,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 - Run NURDVision on Jetson boot
 - Add boiler vs peg detection
 - (Maybe) Have HSL constants get data from robotPreferences or main code
+- add java to install script
 
 ## How to Set Up on the Jetson TK1
 What you will need: a Jetson TK1, the provided Micro USB cable, a PC running UBUNTU 64 bit, a monitor or TV, ethernet access, a mouse and keyboard with a USB hub, a webcam(works best with an LED ring), and the provided 12v power supply
