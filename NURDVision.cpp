@@ -5,6 +5,13 @@
 
 #include <opencv2/opencv.hpp>
 
+#include <chrono>
+#include <cstdio>
+#include <thread>
+#include "ntcore.h"
+
+#include "networktables/NetworkTable.h"
+
 #include <iostream>
 #include <stdlib.h>
 
@@ -228,6 +235,22 @@ int main( int argc, char *argv[] ) {
 		// Display processed image
 		if(argc > 1)if(string(argv[1]) == "-debug")imshow("Processed image", processed);
 	}
+	
+	//Table test
+	auto nt = NetworkTable::GetTable("NURDVision");
+	
+	nt->SetClientMode();
+	nt->SetIPAddress("10.28.39.200\n");
+	
+	nt->Initialize();
+	std::this_thread::sleep_for(std::chrono::seconds(5));
+
+	while (true) { 
+		nt->PutNumber("Distance", distance);
+		nt->PutNumber("Angle", angle);
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	}
+	// Table test end
 	
 	cout << "Viewer closed successfully";
 	return 0;
