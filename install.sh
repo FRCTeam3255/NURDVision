@@ -69,6 +69,6 @@ g++ NURDVision.cpp -Wall -std=c++11  -L ./Linux/arm/ -lstdc++ -lntcore -pthread 
 cd
 rm ./.bash_aliases
 wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
-source ~/.bash_aliases
+source .bash_aliases
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
