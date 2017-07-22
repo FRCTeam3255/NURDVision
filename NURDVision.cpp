@@ -213,6 +213,13 @@ bool quit(){
 }
 
 int main( int argc, char *argv[] ) {
+	//sets up networktables
+	auto nt = NetworkTable::GetTable("NURDVision");
+		
+	nt->SetIPAddress("10.28.39.200\n");
+		
+	nt->Initialize();
+	
 	// Initalizes distance and angle to 0.0;
 	double distance = 0.0;
 	double angle = 0.0;
@@ -231,26 +238,16 @@ int main( int argc, char *argv[] ) {
 		capture.read(raw);
 		// Runs image processing - pass mats raw, returns and stores mat processed, doubles distance and angle
 		processImage(raw, processed, distance, angle);
-		cout << "Distance: "<< distance << "    Angle: " << angle << endl;
-		// Display processed image
-		if(argc > 1)if(string(argv[1]) == "-debug")imshow("Processed image", processed);
-	}
-	
-	//Table test
-	auto nt = NetworkTable::GetTable("NURDVision");
-	
-	nt->SetClientMode();
-	nt->SetIPAddress("10.28.39.200\n");
-	
-	nt->Initialize();
-	std::this_thread::sleep_for(std::chrono::seconds(5));
-
-	while (true) { 
+		//Outputs data to network tables
 		nt->PutNumber("Distance", distance);
 		nt->PutNumber("Angle", angle);
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		// Display processed image
+		if(argc > 1)if(string(argv[1]) == "-debug"){
+			imshow("Processed image", processed);
+			cout << "Distance: "<< distance << "    Angle: " << angle << endl;
+		}
 	}
-	// Table test end
 	
 	cout << "Viewer closed successfully";
 	return 0;
