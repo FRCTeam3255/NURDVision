@@ -1,5 +1,5 @@
 # NURDVision (In Development)
-SuperNURDs implementation of vision co-processing
+SuperNURDs implementation of vision co-processing on the Jetson TK1
 # NOTE: THIS CODE IS CURRENTLY IN DEVELOPMENT AND NOT READY FOR PUBLIC USE
 A public (cleaned up) version will be available shortly
 

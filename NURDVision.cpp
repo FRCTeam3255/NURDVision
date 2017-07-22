@@ -206,6 +206,15 @@ void processImage(Mat& input, Mat& output, double &distance, double &angle){
 	showCrosshairs(output);
 }
 
+//Published Network Tables
+void NetworkTables(double distance,double angle) {
+	NetworkTable::SetClientMode();
+	NetworkTable::SetTeam(3255);
+	auto table = NetworkTable::GetTable("SmartDashboard");
+	table->PutNumber("Distance",distance);
+	table->PutNumber("Angle",angle);
+}
+
 // Returns true to quit when "ESC" is pressed
 bool quit(){
 	char key = (char)waitKey(5);
@@ -213,13 +222,6 @@ bool quit(){
 }
 
 int main( int argc, char *argv[] ) {
-	//sets up networktables
-	auto nt = NetworkTable::GetTable("NURDVision");
-		
-	nt->SetIPAddress("10.28.39.200\n");
-		
-	nt->Initialize();
-	
 	// Initalizes distance and angle to 0.0;
 	double distance = 0.0;
 	double angle = 0.0;
@@ -238,14 +240,11 @@ int main( int argc, char *argv[] ) {
 		capture.read(raw);
 		// Runs image processing - pass mats raw, returns and stores mat processed, doubles distance and angle
 		processImage(raw, processed, distance, angle);
-		//Outputs data to network tables
-		nt->PutNumber("Distance", distance);
-		nt->PutNumber("Angle", angle);
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		// Display processed image
+		NetworkTables(distance, angle);
+		cout << "Distance: "<< distance << "    Angle: " << angle << endl;
 		if(argc > 1)if(string(argv[1]) == "-debug"){
 			imshow("Processed image", processed);
-			cout << "Distance: "<< distance << "    Angle: " << angle << endl;
 		}
 	}
 	
