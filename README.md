@@ -75,4 +75,7 @@ Any questions contact Mike at the SuperNURDs
 
 ### Additional info:
 #### C++ Compiler arguments (nurdcompile)
-	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -o runNURDVision
+	g++ NURDVision.cpp -Wall -std=c++11  -L ./libs -lstdc++ -lntcore -pthread  -Iinclude/ -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -o runNURDVision
+	
+#### Run command (nurdrun)
+	env LD_LIBRARY_PATH=/home/ubuntu/Desktop/libs:$LD_LIBRARY_PATH ./runNURDVision

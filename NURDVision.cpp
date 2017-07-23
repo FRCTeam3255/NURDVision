@@ -210,9 +210,9 @@ void processImage(Mat& input, Mat& output, double &distance, double &angle){
 void NetworkTables(double distance,double angle) {
 	NetworkTable::SetClientMode();
 	NetworkTable::SetTeam(3255);
-	auto table = NetworkTable::GetTable("SmartDashboard");
-	table->PutNumber("Distance",distance);
-	table->PutNumber("Angle",angle);
+	auto table = NetworkTable::GetTable("Vision");
+	table->PutNumber("Distance", distance);
+	table->PutNumber("Angle", angle);
 }
 
 // Returns true to quit when "ESC" is pressed
