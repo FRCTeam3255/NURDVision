@@ -1,23 +1,17 @@
-// =======================================================
-// NURDVision
+// ===========================================================
+// NURDVision - FRCTeam 3255 SuperNURD 2017 Vision Processing
 // written by Mike with help from Tayler
-// =======================================================
-
-#include <opencv2/opencv.hpp>
-
-#include <chrono>
-#include <cstdio>
-#include <thread>
-#include "ntcore.h"
-
-#include "networktables/NetworkTable.h"
+// ===========================================================
 
 #include <iostream>
-#include <stdlib.h>
+#include <opencv2/opencv.hpp>
+#include <networktables/NetworkTable.h>
+#include <ntcore.h>
 
 //'namespaces' are used basically before each command, so 'createMask' is actually cv::createMask. This removes need to do so.
 using namespace std;
 using namespace cv;
+using namespace nt;
 
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
@@ -210,7 +204,6 @@ void processImage(Mat& input, Mat& output, double &distance, double &angle){
 shared_ptr<NetworkTable> InitalizeNetworkTables() {
 	NetworkTable::SetClientMode();
 	NetworkTable::SetTeam(3255);
-//	NetworkTable::Setip("localhost\n");
 	NetworkTable::Initialize();
 	return NetworkTable::GetTable("Vision");
 }
@@ -227,24 +220,53 @@ bool quit(){
 	return( key == 27 || key == 'q' || key == 'Q' ); // key 27 = 'ESC'
 }
 
-int main( int argc, char *argv[] ) {
+int main(int argc, char *argv[]) {
+	cout << "Running NURDVision \tFRCTeam 3255 SuperNURD 2017 Vision Processing\n" << 
+	"\t\t\tCreated by Mike Smith & Tayler Uva\n\n";
+					
+	// Checks run arguments
+	bool local=false;
+	bool debug=false;
+	if(argc >= 2){
+		if(string(argv[1]) == "-local") local=true;
+		if(string(argv[1]) == "-debug") debug=true;
+	}
+	if(argc >= 3){
+		if(string(argv[2]) == "-local") local=true;
+		if(string(argv[2]) == "-debug") debug=true;
+	}
+	cout << "Debug: " << (debug ? "true" : "false") << endl;
+	cout << "localhost: " << (local ? "true" : "false") << endl;
+	cout << endl;
+				
 	// Initalizes distance and angle to 0.0;
 	double distance = 0.0;
 	double angle = 0.0;
 	
 	//Initalizes Networktables
 	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables();
-
+	// If run argument -local is present, set ip address to localhost
+	if(local) NetworkTable::SetIPAddress("localhost");
+	
 	// Creates mats for storing image
 	Mat raw, processed;
 	// Starts video capture of camera 0;
 	VideoCapture capture(0);
 	
-	cout << "Running NURDVision - FRCTeam 3255 SuperNURD Vision Processing v1.0\n" <<
-			"		     Created by Mike Smith & Tayler Uva\n";
-	if(argc > 1)if(string(argv[1]) == "-debug"){
-	cout << "Viewer opened" << endl
-		 << "Press ESC or Q to terminate" << endl;		
+	//Checks if connected to Network Tables - exits with 1 if failed.
+	if(nt::GetConnections().size() == 0){ 
+		cout << "NETWORK TABLES CONNECTION FAILED \tENABLING DEBUG MODE\n";
+		cout << "If Debugging on local computer: Open Outline Viewer and set Host:localhost, Click Start Server" << endl;
+		NetworkTable::Shutdown();
+		debug = true;
+		if(local) return 1;
+	}
+	
+	cout << "\nSTARTING IMAGE PROCESSING\n" << endl;
+	
+	if(debug){
+	cout << "VIEWER OPENED" << endl
+		 << "Press ESC or Q to terminate\n" << endl;		
 	}	
 	// While the quit fucntion does not return true run image functions
 	while (!quit()) {
@@ -254,14 +276,15 @@ int main( int argc, char *argv[] ) {
 		processImage(raw, processed, distance, angle);
 		// Publisheds Data to NetworkTable - Vision
 		PublishNetworkTables(ntable, distance, angle);
-		// Displays text in console (to be removed later and added to debug
-		cout << "Distance: "<< distance << "    Angle: " << angle << endl;
-		if(argc > 1)if(string(argv[1]) == "-debug"){
+		// Runs if debug is true
+		if(debug){
 			// Display processed image
 			imshow("Processed image", processed);
+			// Output data to console
+			cout << "Distance: "<< distance << "\tAngle: " << angle << endl;
 		}
 	}
-	
-	cout << "NURDVision stopped successfully\n";
+	NetworkTable::Shutdown();
+	cout << "\nNURDVision stopped successfully\n";
 	return 0;
 }
