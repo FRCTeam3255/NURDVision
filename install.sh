@@ -1,5 +1,7 @@
-##SETUP OPENCV
+#!/bin/bash
+##NURDVISION INSTALLATION
 
+#UPDATES AND OTHER INSTALLS
 #get ubuntu up to date and add repo
 
 sudo add-apt-repository universe
@@ -20,6 +22,7 @@ sudo apt-get -y install libeigen3-dev
 sudo apt-get -y install libglew1.6-dev
 # GTK development libraries (to allow creating graphical windows)
 sudo apt-get -y install libgtk2.0-dev
+#UPDATES AND OTHER INSTALLS DONE
 
 #OPENCV SETUP
 cd ~/Downloads
@@ -50,27 +53,36 @@ sudo make install
 
 echo "$(tput bold)$(tput setaf 2)OpenCV setup complete"
 
-#Libs setup
+#LIBS & INCLUDE SETUP
+#Libs & include setup is based on: https://github.com/SMblyRequired/Computer-Vision-2017/blob/master/installDeps.sh
 cd
-cd ~/Desktop
-wget https://github.com/FRCTeam3255/NURDVision/raw/master/libs.zip
-wget https://github.com/FRCTeam3255/NURDVision/raw/master/include.zip
-unzip libs.zip
-unzip include.zip
-#Libs setup done
+mkdir /tmp/libinstall
+cd /tmp/libinstall
+wget -O wpiutil.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/wpiutil/1.0.2/wpiutil-1.0.2-desktop.zip
+wget -O ntcore.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/networktables/cpp/NetworkTables/3.1.7/NetworkTables-3.1.7-desktop.zip
+
+unzip wpiutil.zip
+unzip ntcore.zip
+
+sudo cp -r /tmp/libinstall/include/* /usr/local/include/
+sudo cp -r /tmp/libinstall/Linux/x86/* /usr/local/lib #use x86 folder since JetsonTK1 is 32bit
+sudo ldconfig
+rm -rf /tmp/libinstall
+#LIBS & INCLUDE SETUP DONE
 
 #SETUP OUR CODE
 cd
 cd ~/Desktop
 rm NURDVision.cpp
 wget https://github.com/FRCTeam3255/NURDVision/raw/master/NURDVision.cpp
-g++ NURDVision.cpp -Wall -std=c++11  -L ./libs -lstdc++ -lntcore -pthread  -Iinclude/ -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -o runNURDVision
+g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil
 #CODE SETUP DONE
 
-#alias setup
+#ALIAS SETUP
 cd
 rm ./.bash_aliases
 wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
 source .bash_aliases
+#ALIAS SETUP DONE
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"

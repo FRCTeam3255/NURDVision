@@ -206,12 +206,17 @@ void processImage(Mat& input, Mat& output, double &distance, double &angle){
 	showCrosshairs(output);
 }
 
-//Published Network Tables
-void NetworkTables(double distance,double angle) {
+//Initalize Network Tables to team 3255 and returns table to use
+shared_ptr<NetworkTable> InitalizeNetworkTables() {
 	NetworkTable::SetClientMode();
 	NetworkTable::SetTeam(3255);
+//	NetworkTable::Setip("localhost\n");
 	NetworkTable::Initialize();
-	auto table = NetworkTable::GetTable("Vision");
+	return NetworkTable::GetTable("Vision");
+}
+
+//Publish Network Tables to table in use
+void PublishNetworkTables(shared_ptr<NetworkTable> table, double distance,double angle) {
 	table->PutNumber("Distance", distance);
 	table->PutNumber("Angle", angle);
 }
@@ -227,28 +232,36 @@ int main( int argc, char *argv[] ) {
 	double distance = 0.0;
 	double angle = 0.0;
 	
+	//Initalizes Networktables
+	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables();
+
 	// Creates mats for storing image
 	Mat raw, processed;
 	// Starts video capture of camera 0;
 	VideoCapture capture(0);
 	
+	cout << "Running NURDVision - FRCTeam 3255 SuperNURD Vision Processing v1.0\n" <<
+			"		     Created by Mike Smith & Tayler Uva\n";
+	if(argc > 1)if(string(argv[1]) == "-debug"){
 	cout << "Viewer opened" << endl
 		 << "Press ESC or Q to terminate" << endl;		
-		
+	}	
 	// While the quit fucntion does not return true run image functions
 	while (!quit()) {
 		// Stores capture to raw mat
 		capture.read(raw);
 		// Runs image processing - pass mats raw, returns and stores mat processed, doubles distance and angle
 		processImage(raw, processed, distance, angle);
-		// Display processed image
-		NetworkTables(distance, angle);
+		// Publisheds Data to NetworkTable - Vision
+		PublishNetworkTables(ntable, distance, angle);
+		// Displays text in console (to be removed later and added to debug
 		cout << "Distance: "<< distance << "    Angle: " << angle << endl;
 		if(argc > 1)if(string(argv[1]) == "-debug"){
+			// Display processed image
 			imshow("Processed image", processed);
 		}
 	}
 	
-	cout << "Viewer closed successfully";
+	cout << "NURDVision stopped successfully\n";
 	return 0;
 }
