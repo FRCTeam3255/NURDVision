@@ -6,11 +6,10 @@ A public (cleaned up) version will be available shortly
 Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
 
 ### TO DO:
-- Implement network tables
 - Run NURDVision on Jetson boot
 - Add boiler vs peg detection
 - (Maybe) Have HSL constants get data from robotPreferences or main code
-- add java to install script
+- ~~Implement network tables~~ **COMPLETED**
 
 ## How to Set Up on the Jetson TK1
 What you will need: a Jetson TK1, the provided Micro USB cable, a PC running UBUNTU 64 bit, a monitor or TV, ethernet access, a mouse and keyboard with a USB hub, a webcam(works best with an LED ring), and the provided 12v power supply
@@ -75,7 +74,4 @@ Any questions contact Mike at the SuperNURDs
 
 ### Additional info:
 #### C++ Compiler arguments (nurdcompile)
-	g++ NURDVision.cpp -Wall -std=c++11  -L ./libs -lstdc++ -lntcore -pthread  -Iinclude/ -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -o runNURDVision
-	
-#### Run command (nurdrun)
-	env LD_LIBRARY_PATH=/home/ubuntu/Desktop/libs:$LD_LIBRARY_PATH ./runNURDVision
+	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -o runNURDVision

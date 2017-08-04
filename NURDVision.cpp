@@ -11,7 +11,6 @@
 //'namespaces' are used basically before each command, so 'createMask' is actually cv::createMask. This removes need to do so.
 using namespace std;
 using namespace cv;
-using namespace nt;
 
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
