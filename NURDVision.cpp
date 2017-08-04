@@ -210,6 +210,7 @@ void processImage(Mat& input, Mat& output, double &distance, double &angle){
 void NetworkTables(double distance,double angle) {
 	NetworkTable::SetClientMode();
 	NetworkTable::SetTeam(3255);
+	NetworkTable::Initialize();
 	auto table = NetworkTable::GetTable("Vision");
 	table->PutNumber("Distance", distance);
 	table->PutNumber("Angle", angle);

@@ -54,7 +54,9 @@ echo "$(tput bold)$(tput setaf 2)OpenCV setup complete"
 cd
 cd ~/Desktop
 wget https://github.com/FRCTeam3255/NURDVision/raw/master/libs.zip
+wget https://github.com/FRCTeam3255/NURDVision/raw/master/include.zip
 unzip libs.zip
+unzip include.zip
 #Libs setup done
 
 #SETUP OUR CODE
