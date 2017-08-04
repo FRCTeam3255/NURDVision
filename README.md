@@ -9,6 +9,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 - Run NURDVision on Jetson boot
 - Add boiler vs peg detection
 - (Maybe) Have HSL constants get data from robotPreferences or main code
+- (Maybe) Implement CSCore to send video data to roborio/driverstation
 - ~~Implement network tables~~ **COMPLETED**
 
 ## How to Set Up on the Jetson TK1
