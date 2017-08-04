@@ -58,14 +58,14 @@ echo "$(tput bold)$(tput setaf 2)OpenCV setup complete"
 cd
 mkdir /tmp/libinstall
 cd /tmp/libinstall
-wget -O wpiutil.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/wpiutil/1.0.2/wpiutil-1.0.2-desktop.zip
-wget -O ntcore.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/networktables/cpp/NetworkTables/3.1.7/NetworkTables-3.1.7-desktop.zip
+wget -O wpiutil.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/wpiutil/1.0.2/wpiutil-1.0.2-armhf.zip
+wget -O ntcore.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/networktables/cpp/NetworkTables/3.1.7/NetworkTables-3.1.7-armhf.zip
 
 unzip wpiutil.zip
 unzip ntcore.zip
 
 sudo cp -r /tmp/libinstall/include/* /usr/local/include/
-sudo cp -r /tmp/libinstall/Linux/x86/* /usr/local/lib #use x86 folder since JetsonTK1 is 32bit
+sudo cp -r /tmp/libinstall/Linux/arm/* /usr/local/lib #use arm folder since JetsonTK1 is 32bit
 sudo ldconfig
 rm -rf /tmp/libinstall
 #LIBS & INCLUDE SETUP DONE
