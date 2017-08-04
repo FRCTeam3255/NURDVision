@@ -33,7 +33,7 @@ __Step 6__: Download flashJetson.run Type:
 
 __Step 7__: Continue through the user intuitive flashing process (this may take a few hours) selecting Jetson Tk1 where available
 
-Follow the on screen steps. 
+Follow the on screen steps. Where it says Host - Ubuntu, click install, then no action
 
 _**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
 
