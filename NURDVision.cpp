@@ -178,6 +178,7 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 		putText(output, "Area Target 2: "+ to_string(target2Area), Point2f(30, 9*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 	}
 }
+
 // Does the image processing
 void processImage(Mat& input, Mat& output, double &distance, double &angle){
 	// Mats for processed outputs
@@ -251,15 +252,6 @@ int main(int argc, char *argv[]) {
 	Mat raw, processed;
 	// Starts video capture of camera 0;
 	VideoCapture capture(0);
-	
-	//Checks if connected to Network Tables - exits with 1 if failed.
-	if(nt::GetConnections().size() == 0){ 
-		cout << "NETWORK TABLES CONNECTION FAILED \tENABLING DEBUG MODE\n";
-		cout << "If Debugging on local computer: Open Outline Viewer and set Host:localhost, Click Start Server" << endl;
-		NetworkTable::Shutdown();
-		debug = true;
-		if(local) return 1;
-	}
 	
 	cout << "\nSTARTING IMAGE PROCESSING\n" << endl;
 	
