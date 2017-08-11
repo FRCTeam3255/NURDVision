@@ -8,6 +8,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 ### TO DO:
 - Run NURDVision on Jetson boot
 - Add boiler vs peg detection
+- Have jetson send failed camera message to roborio
 - (Maybe) Have HSL constants get data from robotPreferences or main code
 - (Maybe) Implement CSCore to send video data to roborio/driverstation
 - ~~Implement network tables~~ **COMPLETED**

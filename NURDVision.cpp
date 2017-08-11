@@ -201,11 +201,11 @@ void processImage(Mat& input, Mat& output, double &distance, double &angle){
 }
 
 //Initalize Network Tables to team 3255 and returns table to use
-shared_ptr<NetworkTable> InitalizeNetworkTables() {
+shared_ptr<NetworkTable> InitalizeNetworkTables(int teamNumber) {
 	NetworkTable::SetClientMode();
-	NetworkTable::SetTeam(3255);
+	NetworkTable::SetTeam(teamNumber);
 	NetworkTable::Initialize();
-	return NetworkTable::GetTable("Vision");
+	return NetworkTable::GetTable("NURDVision");
 }
 
 //Publish Network Tables to table in use
@@ -221,7 +221,7 @@ bool quit(){
 }
 
 int main(int argc, char *argv[]) {
-	cout << "Running NURDVision \tFRCTeam 3255 SuperNURD 2017 Vision Processing\n" << 
+	cout << "\e[1mRunning \e[34mNURD\e[31mVision\e[0m \tFRCTeam 3255 SuperNURD 2017 Vision Processing\n" << 
 	"\t\t\tCreated by Mike Smith & Tayler Uva\n\n";
 					
 	// Checks run arguments
@@ -235,8 +235,8 @@ int main(int argc, char *argv[]) {
 		if(string(argv[2]) == "-local") local=true;
 		if(string(argv[2]) == "-debug") debug=true;
 	}
-	cout << "Debug: " << (debug ? "true" : "false") << endl;
-	cout << "localhost: " << (local ? "true" : "false") << endl;
+	cout << "Debug: " << (debug ? "\e[32mtrue\e[0m" : "\e[31mfalse\e[0m") << endl;
+	cout << "localhost: " << (local ? "\e[32mtrue\e[0m" : "\e[31mfalse\e[0m") << endl;
 	cout << endl;
 				
 	// Initalizes distance and angle to 0.0;
@@ -244,7 +244,8 @@ int main(int argc, char *argv[]) {
 	double angle = 0.0;
 	
 	//Initalizes Networktables
-	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables();
+	int teamNumber = 3255;
+	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables(teamNumber);
 	// If run argument -local is present, set ip address to localhost
 	if(local) NetworkTable::SetIPAddress("localhost");
 	
@@ -252,6 +253,11 @@ int main(int argc, char *argv[]) {
 	Mat raw, processed;
 	// Starts video capture of camera 0;
 	VideoCapture capture(0);
+	if (!capture.isOpened()) {
+		cerr << "\n\e[31mERROR! Unable to open camera\nERROR! Is the camera connected?\e[0m\n";
+		NetworkTable::Shutdown();
+		return 1;
+	}
 	
 	cout << "\nSTARTING IMAGE PROCESSING\n" << endl;
 	

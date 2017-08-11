@@ -22,6 +22,9 @@ sudo apt-get -y install libeigen3-dev
 sudo apt-get -y install libglew1.6-dev
 # GTK development libraries (to allow creating graphical windows)
 sudo apt-get -y install libgtk2.0-dev
+# LibsSTDC++6 linking libraries (to compile NURDVision properly with g++)
+sudo apt-get -y install libstdc++6
+
 #UPDATES AND OTHER INSTALLS DONE
 
 #OPENCV SETUP
