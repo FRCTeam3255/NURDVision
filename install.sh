@@ -89,9 +89,13 @@ source .bash_aliases
 #ALIAS SETUP DONE
 
 #SET UP BOOT START RUN THING
-cd /etc/init.d/
-sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/rc.local
-cd
+cd /home/ubuntu/Desktop/
+sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/runscript.sh
+(crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/Desktop/runscript.sh") | crontab -
+# so this is all basically first making it run the script at startup (our nurdvision) and it makes it so there isnt a desktop GUI running on the jetson, which slows down our code
+cd /etc/X11
+sudo rm default-display-manager
+sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/default-display-manager
 #BOOT START RUN THING DONE
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
