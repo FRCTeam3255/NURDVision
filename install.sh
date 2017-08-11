@@ -88,4 +88,10 @@ wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_alias
 source .bash_aliases
 #ALIAS SETUP DONE
 
+#SET UP BOOT START RUN THING
+cd /etc/init.d/
+sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/rc.local
+cd
+#BOOT START RUN THING DONE
+
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
