@@ -6,7 +6,7 @@ A public (cleaned up) version will be available shortly
 Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
 
 ### TO DO:
-- Run NURDVision on Jetson boot
+- ~~Run NURDVision on Jetson boot~~ **COMPLETED**
 - Add boiler vs peg detection
 - Have jetson send failed camera message to roborio
 - (Maybe) Have HSL constants get data from robotPreferences or main code
