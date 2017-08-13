@@ -8,6 +8,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 ### TO DO:
 - Add boiler vs peg detection
 - Have jetson send failed camera message to roborio
+- Add how to see jetson from roboRIO to read me.
 - (Maybe) Have HSL constants get data from robotPreferences or main code
 - (Maybe) Implement CSCore to send video data to roborio/driverstation
 - ~~Run NURDVision on Jetson boot~~ **COMPLETED**
@@ -32,11 +33,24 @@ __Step 6__: Download flashJetson.run Type (and then click enter):
 	
 	 mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
 	
-<img src="flashJetsonSteps/Step-6.png" width="850">
+![s6](flashJetsonSteps/Step-6.png)
 
-__Step 7__: Continue through the user intuitive flashing process (this may take a few hours) selecting Jetson Tk1 where available
-<img src="flashJetsonSteps/Step-7.png" width="1200">
-Follow the on screen steps. Where it says Host - Ubuntu, click install, then no action
+__Step 7__: Continue through the user intuitive flashing process (this may take a few hours) selecting Jetson Tk1 where available (Detailed steps below).
+
+![s7](flashJetsonSteps/Step-7.png)
+![s8](flashJetsonSteps/Step-8.png)
+![s9](flashJetsonSteps/Step-9.png)
+![s10](flashJetsonSteps/Step-10.png)
+![s11](flashJetsonSteps/Step-11.png)
+![s12](flashJetsonSteps/Step-12.png)
+![s13](flashJetsonSteps/Step-13.png)
+![s14](flashJetsonSteps/Step-14.png)
+![s15](flashJetsonSteps/Step-15.png)
+![s16](flashJetsonSteps/Step-16.png)
+![s17](flashJetsonSteps/Step-17.png)
+![s18](flashJetsonSteps/Step-18.png)
+![s19](flashJetsonSteps/Step-19.png)
+![s20](flashJetsonSteps/Step-20.png)
 
 _**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
 
@@ -74,9 +88,13 @@ _Jetson NURDVision installation complete!_
 
 These commands can be run invidually if needed (i.e. only nurdcompile and nurdrun if disconnected from internet)
 
-Any questions contact Mike at the SuperNURDs
+Any questions contact Mike at the SuperNURDs by leaving an issue report on our Github.
 
 ### Additional info:
-Our belief is that the Jetson TK1 requires ARMHF libraries as such, those are the libraries installed with the install script.
+The Jetson TK1 requires ARM-HF libraries, as such, those are the libraries installed with the install script.
+Our install script sets NURDVision to run at startup and disables desktop GUI running on the jetson, which slows down vision processing.
+To make NURDVision communicate with a roboRIO other than FRC Team 3255's edit NURDVision.cpp with either SSH or FTP and change
+	
+	const int teamNumber = YOUR TEAM NUMBER;
 #### C++ Compiler arguments (nurdcompile)
 	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -o runNURDVision

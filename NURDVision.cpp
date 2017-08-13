@@ -1,5 +1,5 @@
 // ===========================================================
-// NURDVision - FRCTeam 3255 SuperNURD 2017 Vision Processing
+// NURDVision - FRC Team 3255 SuperNURD 2017 Vision Processing
 // written by Mike with help from Tayler
 // ===========================================================
 
@@ -11,6 +11,9 @@
 //'namespaces' are used basically before each command, so 'createMask' is actually cv::createMask. This removes need to do so.
 using namespace std;
 using namespace cv;
+
+// FIRST Robotics Competition team number
+const int teamNumber = 3255;
 
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
@@ -237,6 +240,7 @@ int main(int argc, char *argv[]) {
 	}
 	cout << "Debug: " << (debug ? "\e[32mtrue\e[0m" : "\e[31mfalse\e[0m") << endl;
 	cout << "localhost: " << (local ? "\e[32mtrue\e[0m" : "\e[31mfalse\e[0m") << endl;
+	cout << "Team Number: " << "\e[34m" << teamNumber << "\e[0m" << endl;
 	cout << endl;
 				
 	// Initalizes distance and angle to 0.0;
@@ -244,7 +248,6 @@ int main(int argc, char *argv[]) {
 	double angle = 0.0;
 	
 	//Initalizes Networktables
-	int teamNumber = 3255;
 	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables(teamNumber);
 	// If run argument -local is present, set ip address to localhost
 	if(local) NetworkTable::SetIPAddress("localhost");

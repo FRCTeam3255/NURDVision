@@ -89,10 +89,11 @@ source .bash_aliases
 #ALIAS SETUP DONE
 
 #SET UP BOOT START RUN THING
+# Sets NURDVision to run at startup
 cd /home/ubuntu/Desktop/
 sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/runscript.sh
 (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/Desktop/runscript.sh") | crontab -
-# so this is all basically first making it run the script at startup (our nurdvision) and it makes it so there isnt a desktop GUI running on the jetson, which slows down our code
+# Disables desktop GUI running on the jetson, which slows down vision processing
 cd /etc/X11
 sudo rm default-display-manager
 sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/default-display-manager
