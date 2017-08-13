@@ -19,7 +19,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 - ~~Run NURDVision on Jetson boot~~ **COMPLETED**
 - ~~Implement network tables~~ **COMPLETED**
 
-## How to Set Up on the Jetson TK1
+## How to Set Up on the Jetson TK1 - [Back to Top](#)
 What you will need: a Jetson TK1, the provided Micro USB cable, a PC running UBUNTU 64 bit, a monitor or TV, ethernet access to same network as your UBUNTU PC, a mouse and keyboard with a USB hub, a webcam(works best with an LED ring), and the provided 12v power supply
 
 ### Jetson initial setup and flashing:
@@ -64,7 +64,7 @@ It should say flash succesfull.
 
 _Jetson intial setup complete!_
 
-### Jetson NURDVision installation: 
+### Jetson NURDVision installation: - [Back to Top](#)
 **Access to the internet is required - make sure the jetson is connect to the internet via ethernet**
 
 A PC is no longer needed as this work is done on the jetson itself.
@@ -84,7 +84,7 @@ __Step 2__: once complete you can now download the latest code, compile and run 
 
 _Jetson NURDVision installation complete!_
 
-### Custom command info:
+### Custom command info: - [Back to Top](#)
 Our install script adds a custom .bash_aliases file allowing you to use the custom commands below:
 
 	nurdget 		downloads latest NURDVision from github
@@ -99,12 +99,12 @@ These commands can be run invidually if needed (i.e. only nurdget and nurdall re
 
 Any questions contact Mike at the SuperNURDs by leaving an issue report on our Github.
 
-### Additional info:
+### Additional info: - [Back to Top](#)
 The Jetson TK1 requires ARM-HF libraries, as such, those are the libraries installed with the install script.
 Our install script sets NURDVision to run at startup and disables desktop GUI running on the jetson, which slows down vision processing.
 To make NURDVision communicate with a roboRIO other than FRC Team 3255's edit NURDVision.cpp with either SSH or FTP and change
 	
 	const int teamNumber = YOUR TEAM NUMBER;
 
-#### C++ Compiler arguments (nurdcompile)
+#### C++ Compiler arguments (nurdcompile): - [Back to Top](#)
 	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -o runNURDVision
