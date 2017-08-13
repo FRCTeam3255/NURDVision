@@ -6,11 +6,11 @@ A public (cleaned up) version will be available shortly
 Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
 
 ### TO DO:
-- ~~Run NURDVision on Jetson boot~~ **COMPLETED**
 - Add boiler vs peg detection
 - Have jetson send failed camera message to roborio
 - (Maybe) Have HSL constants get data from robotPreferences or main code
 - (Maybe) Implement CSCore to send video data to roborio/driverstation
+- ~~Run NURDVision on Jetson boot~~ **COMPLETED**
 - ~~Implement network tables~~ **COMPLETED**
 
 ## How to Set Up on the Jetson TK1
@@ -28,12 +28,14 @@ __Step 4__: Open up console (terminal) on your LINUX computer
 
 __Step 5__: Type lsusb into the ubuntu PC's console and check to make sure that there is a NVidia device plugged in
 
-__Step 6__: Download flashJetson.run Type: 
+__Step 6__: Download flashJetson.run Type (and then click enter): 
 	
 	 mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
+	
+<img src="flashJetsonSteps/Step-6.png" width="850">
 
 __Step 7__: Continue through the user intuitive flashing process (this may take a few hours) selecting Jetson Tk1 where available
-
+<img src="flashJetsonSteps/Step-7.png" width="1200">
 Follow the on screen steps. Where it says Host - Ubuntu, click install, then no action
 
 _**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
