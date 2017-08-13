@@ -1,9 +1,14 @@
-# NURDVision (In Development)
+# NURDVision
 SuperNURDs implementation of vision co-processing on the Jetson TK1
-# NOTE: THIS CODE IS CURRENTLY IN DEVELOPMENT AND NOT READY FOR PUBLIC USE
-A public (cleaned up) version will be available shortly
 
 Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
+
+## Table of contents
+- [How to Set Up on the Jetson TK1](#how-to-set-up-on-the-jetson-tk1)
+- [Jetson NURDVsion Installation](#jetson-nurdvision-installation)
+- [Custom Command Info](#custom-command-info)
+- [Additional Info](#additional-info)
+- [C++ Compiler arguments (nurdcompile)](#c-compiler-arguments-nurdcompile)
 
 ### TO DO:
 - Add boiler vs peg detection
@@ -15,7 +20,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 - ~~Implement network tables~~ **COMPLETED**
 
 ## How to Set Up on the Jetson TK1
-What you will need: a Jetson TK1, the provided Micro USB cable, a PC running UBUNTU 64 bit, a monitor or TV, ethernet access, a mouse and keyboard with a USB hub, a webcam(works best with an LED ring), and the provided 12v power supply
+What you will need: a Jetson TK1, the provided Micro USB cable, a PC running UBUNTU 64 bit, a monitor or TV, ethernet access to same network as your UBUNTU PC, a mouse and keyboard with a USB hub, a webcam(works best with an LED ring), and the provided 12v power supply
 
 ### Jetson initial setup and flashing:
 
@@ -31,7 +36,7 @@ __Step 5__: Type lsusb into the ubuntu PC's console and check to make sure that 
 
 __Step 6__: Download flashJetson.run Type (and then click enter): 
 	
-	 mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
+	mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
 	
 ![s6](flashJetsonSteps/Step-6.png)
 
@@ -41,18 +46,17 @@ __Step 7__: Continue through the user intuitive flashing process (this may take 
 ![s8](flashJetsonSteps/Step-8.png)
 ![s9](flashJetsonSteps/Step-9.png)
 ![s10](flashJetsonSteps/Step-10.png)
+
+> _**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
+
 ![s11](flashJetsonSteps/Step-11.png)
 ![s12](flashJetsonSteps/Step-12.png)
+(This may take a while)
 ![s13](flashJetsonSteps/Step-13.png)
 ![s14](flashJetsonSteps/Step-14.png)
 ![s15](flashJetsonSteps/Step-15.png)
 ![s16](flashJetsonSteps/Step-16.png)
 ![s17](flashJetsonSteps/Step-17.png)
-![s18](flashJetsonSteps/Step-18.png)
-![s19](flashJetsonSteps/Step-19.png)
-![s20](flashJetsonSteps/Step-20.png)
-
-_**DO NOT INSTALL OPENCV OR ANY SAMPLES AT THIS POINT**_. 
 
 It should say flash succesfull.
 
@@ -61,11 +65,14 @@ It should say flash succesfull.
 _Jetson intial setup complete!_
 
 ### Jetson NURDVision installation: 
-A PC is no longer needed as this work is done on the jetson
+**Access to the internet is required - make sure the jetson is connect to the internet via ethernet**
 
-(alterantively can be done by ssh by typing: ssh ubuntu@tegra-ubuntu password:ubuntu and typing commands there instead)
+A PC is no longer needed as this work is done on the jetson itself.
+Alterantively this can be done via ssh (password ubuntu) by typing:
+	
+	ssh ubuntu@tegra-ubuntu.local
 
-__Step 1__: download install.sh to jetson. Type: 
+__Step 1__: Download install.sh to jetson and run it. Type: 
 	
 	wget https://github.com/FRCTeam3255/NURDVision/raw/master/install.sh; bash ./install.sh
 
@@ -77,16 +84,18 @@ __Step 2__: once complete you can now download the latest code, compile and run 
 
 _Jetson NURDVision installation complete!_
 
-### Custom command info: 	
+### Custom command info:
+Our install script adds a custom .bash_aliases file allowing you to use the custom commands below:
 
 	nurdget 		downloads latest NURDVision from github
 	nurdcompile		compliles NURDVision as runNURDVision
 	nurdrun			runs runNURDVision
 	nurdrun	-debug		runs runNURDVision with viewer
+	nurdrun	-local		runs runNURDVision with localhost set as IP for NetworkTables for debugging locally
 		
 	nurdall			runs nurdget, nurdcompile, and nurdrun -debug;
 
-These commands can be run invidually if needed (i.e. only nurdcompile and nurdrun if disconnected from internet)
+These commands can be run invidually if needed (i.e. only nurdget and nurdall require an internet connection)
 
 Any questions contact Mike at the SuperNURDs by leaving an issue report on our Github.
 
@@ -96,5 +105,6 @@ Our install script sets NURDVision to run at startup and disables desktop GUI ru
 To make NURDVision communicate with a roboRIO other than FRC Team 3255's edit NURDVision.cpp with either SSH or FTP and change
 	
 	const int teamNumber = YOUR TEAM NUMBER;
+
 #### C++ Compiler arguments (nurdcompile)
 	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -o runNURDVision

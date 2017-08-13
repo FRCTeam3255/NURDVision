@@ -1,5 +1,6 @@
 #!/bin/bash
 ##NURDVISION INSTALLATION
+echo "$(tput bold)Starting $(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation - INTERNET CONNECTION REQUIRED"
 
 #UPDATES AND OTHER INSTALLS
 #get ubuntu up to date and add repo
@@ -88,7 +89,7 @@ wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_alias
 source .bash_aliases
 #ALIAS SETUP DONE
 
-#SET UP BOOT START RUN THING
+#RUN ON START UP SET UP
 # Sets NURDVision to run at startup
 cd /home/ubuntu/Desktop/
 sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/runscript.sh
@@ -97,6 +98,6 @@ sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/runscr
 cd /etc/X11
 sudo rm default-display-manager
 sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/default-display-manager
-#BOOT START RUN THING DONE
+#RUN ON START UP SET UP DONE
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
