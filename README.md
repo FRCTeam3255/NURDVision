@@ -65,7 +65,7 @@ It should say flash succesfull.
 _Jetson intial setup complete!_
 
 ### Jetson NURDVision installation: 
-**Access to the internet is required - make sure the jetson is connect to the internet via ethernet**
+**Access to the internet is required - make sure the jetson is connected to the internet via ethernet**
 
 A PC is no longer needed as this work is done on the jetson itself.
 Alterantively this can be done via ssh (password ubuntu) by typing:
