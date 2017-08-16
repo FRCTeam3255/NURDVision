@@ -34,7 +34,7 @@ __Step 4__: Open up console (terminal) on your LINUX computer
 
 __Step 5__: Type lsusb into the ubuntu PC's console and check to make sure that there is a NVidia device plugged in
 
-__Step 6__: Download flashJetson.run Type (and then click enter): 
+__Step 6__: Download flashJetson.run Type (and then click enter, password: ubuntu): 
 	
 	mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
 	
