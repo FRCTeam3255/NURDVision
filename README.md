@@ -11,11 +11,11 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 - [C++ Compiler arguments (nurdcompile)](#c-compiler-arguments-nurdcompile)
 
 ### TO DO:
+- Implement CSCore to send video data to roborio/driverstation for tuning at competition
+- Have HSL constants get data from robotPreferences or main code for tuning at competition
 - Add boiler vs peg detection
 - Have jetson send failed camera message to roborio
 - Add how to see jetson from roboRIO to read me.
-- (Maybe) Have HSL constants get data from robotPreferences or main code
-- (Maybe) Implement CSCore to send video data to roborio/driverstation
 - ~~Run NURDVision on Jetson boot~~ **COMPLETED**
 - ~~Implement network tables~~ **COMPLETED**
 

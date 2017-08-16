@@ -11,6 +11,8 @@ sudo apt-get -y upgrade
 sudo apt-get -y dist-upgrade
 sudo apt-get -y autoremove
 
+# LibsSTDC++6 linking libraries (to compile NURDVision properly with g++)
+sudo apt-get -y install libstdc++6
 # Some general development libraries
 sudo apt-get -y install build-essential make cmake cmake-curses-gui g++
 # libav video input/output development libraries
@@ -23,8 +25,9 @@ sudo apt-get -y install libeigen3-dev
 sudo apt-get -y install libglew1.6-dev
 # GTK development libraries (to allow creating graphical windows)
 sudo apt-get -y install libgtk2.0-dev
-# LibsSTDC++6 linking libraries (to compile NURDVision properly with g++)
-sudo apt-get -y install libstdc++6
+
+# Refresh installed libraries (if error @GLIBCXX_3.4.20 occurs follow steps: https://askubuntu.com/a/409831
+sudo apt-get -y dist-upgrade
 
 #UPDATES AND OTHER INSTALLS DONE
 
@@ -74,6 +77,13 @@ sudo ldconfig
 rm -rf /tmp/libinstall
 #LIBS & INCLUDE SETUP DONE
 
+#ALIAS SETUP
+cd
+rm ./.bash_aliases
+wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
+source .bash_aliases
+#ALIAS SETUP DONE
+
 #SETUP OUR CODE
 cd
 cd ~/Desktop
@@ -81,13 +91,6 @@ rm NURDVision.cpp
 wget https://github.com/FRCTeam3255/NURDVision/raw/master/NURDVision.cpp
 g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil
 #CODE SETUP DONE
-
-#ALIAS SETUP
-cd
-rm ./.bash_aliases
-wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
-source .bash_aliases
-#ALIAS SETUP DONE
 
 #RUN ON START UP SET UP
 # Sets NURDVision to run at startup

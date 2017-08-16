@@ -18,24 +18,24 @@ const int teamNumber = 3255;
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-const double Hue[] = {0, 49};
-const double Saturation[] = {150, 255};
-const double Luminance[] = {245, 255};
+//const double Hue[] = {0, 49};
+//const double Saturation[] = {150, 255};
+//const double Luminance[] = {245, 255};
 
-const double OBJECT_AREA = 2.5; //Area of the tracking tape in real life
-const double PIXEL_AREA = 30000; //Area of the pixels at 10 inches
-const double BASE_DISTANCE = 10; //Distance from camera to use as base for calucation
-// =================================================//
-
-// ========= Constants for Phone tracking ============//
-// Store an array: [0] = lower bound, [1] = upper bound
-//const double Hue[] = {0, 0};
-//const double Saturation[] = {0, 0};
-//const double Luminance[] = {255, 255};
-//
 //const double OBJECT_AREA = 2.5; //Area of the tracking tape in real life
 //const double PIXEL_AREA = 30000; //Area of the pixels at 10 inches
 //const double BASE_DISTANCE = 10; //Distance from camera to use as base for calucation
+// =================================================//
+
+// ========= Constants for SykoraBot ============//
+// Store an array: [0] = lower bound, [1] = upper bound
+const double Hue[] = {0, 180};
+const double Saturation[] = {0, 255};
+const double Luminance[] = {240, 255};
+//
+const double OBJECT_AREA = 18.5; //Area of the tracking tape in real life
+const double PIXEL_AREA = 8190; //Area of the pixels at base distance
+const double BASE_DISTANCE = 26; //Distance from camera to use as base for calucation
 // =================================================//
 
 // ============ Color Constants ============ //
