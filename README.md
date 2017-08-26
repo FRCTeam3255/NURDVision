@@ -101,7 +101,9 @@ Any questions contact Mike at the SuperNURDs by leaving an issue report on our G
 
 ### Additional info:
 The Jetson TK1 requires ARM-HF libraries, as such, those are the libraries installed with the install script.
+
 Our install script sets NURDVision to run at startup and disables desktop GUI running on the jetson, which slows down vision processing.
+
 To make NURDVision communicate with a roboRIO other than FRC Team 3255's edit NURDVision.cpp with either SSH or FTP and change
 	
 	const int teamNumber = YOUR TEAM NUMBER;
