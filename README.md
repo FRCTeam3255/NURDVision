@@ -16,7 +16,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 - Add boiler vs peg detection
 - Have jetson send failed camera message to roborio
 - Add how to see jetson from roboRIO to read me.
-- ~~Run NURDVision on Jetson boot~~ **COMPLETED**
+- Run NURDVision on Jetson boot
 - ~~Implement network tables~~ **COMPLETED**
 
 ## How to Set Up on the Jetson TK1
