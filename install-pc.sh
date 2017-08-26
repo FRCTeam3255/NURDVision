@@ -77,11 +77,11 @@ sudo ldconfig
 rm -rf /tmp/libinstall
 #LIBS & INCLUDE SETUP DONE
 
-#ALIAS SETUP
-cd
-rm ./.bash_aliases
-wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
-source .bash_aliases
+#ALIAS SETUP - CURRENTLY DISABLED
+#cd
+#rm ./.bash_aliases
+#wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
+#source .bash_aliases
 #ALIAS SETUP DONE
 
 #SETUP OUR CODE
