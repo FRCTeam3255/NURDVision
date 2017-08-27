@@ -81,8 +81,9 @@ rm -rf /tmp/libinstall
 
 #ALIAS SETUP
 cd
-rm ./.bash_aliases
-wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/.bash_aliases
+wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/nurdcommands.txt
+cat nurdcommands.txt >> .bash_aliases
+source .bash_aliases
 source .bash_aliases
 #ALIAS SETUP DONE
 
