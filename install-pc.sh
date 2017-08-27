@@ -89,8 +89,6 @@ sudo apt-get install ./grip.deb
 cd
 wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/nurdcommands.txt
 cat nurdcommands.txt >> .bash_aliases
-source .bash_aliases
-source .bash_aliases
 #ALIAS SETUP DONE
 
 #SETUP OUR CODE
