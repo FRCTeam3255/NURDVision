@@ -6,6 +6,7 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 ## Table of contents
 - [How to Set Up on the Jetson TK1](#how-to-set-up-on-the-jetson-tk1)
 - [Jetson NURDVsion Installation](#jetson-nurdvision-installation)
+- [PC NURDVsion Installation](#pc-nurdvision-installation)
 - [Custom Command Info](#custom-command-info)
 - [Additional Info](#additional-info)
 - [C++ Compiler arguments (nurdcompile)](#c-compiler-arguments-nurdcompile)
@@ -75,6 +76,20 @@ Alterantively this can be done via ssh (password ubuntu) by typing:
 __Step 1__: Download install.sh to jetson and run it. Type: 
 	
 	wget https://github.com/FRCTeam3255/NURDVision/raw/master/install.sh; bash ./install.sh
+
+(this may take a few hours)
+
+__Step 2__: once complete you can now download the latest code, compile and run it, type:
+
+	nurdall
+
+_Jetson NURDVision installation complete!_
+
+### PC NURDVision installation:
+
+__Step 1__: Download install.sh to your computer and run it. Type: 
+	
+	wget https://github.com/FRCTeam3255/NURDVision/raw/master/install-pc.sh; bash ./install-pc.sh
 
 (this may take a few hours)
 

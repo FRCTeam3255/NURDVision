@@ -6,28 +6,30 @@ echo "$(tput bold)Starting $(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf
 #get ubuntu up to date and add repo
 
 sudo add-apt-repository universe
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get dist-upgrade
-sudo apt-get autoremove
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
 
 # LibsSTDC++6 linking libraries (to compile NURDVision properly with g++)
-sudo apt-get install libstdc++6
+sudo apt-get -y install libstdc++6
 # Some general development libraries
-sudo apt-get install build-essential make cmake cmake-curses-gui g++
+sudo apt-get -y install build-essential make cmake cmake-curses-gui g++
 # libav video input/output development libraries
-sudo apt-get install libavformat-dev libavutil-dev libswscale-dev
+sudo apt-get -y install libavformat-dev libavutil-dev libswscale-dev
 # Video4Linux camera development libraries
-sudo apt-get install libv4l-dev
+sudo apt-get -y install libv4l-dev
 # Eigen3 math development libraries
-sudo apt-get install libeigen3-dev
+sudo apt-get -y install libeigen3-dev
 # OpenGL development libraries (to allow creating graphical windows)
-sudo apt-get install libglew1.6-dev
+sudo apt-get -y install libglew1.6-dev
 # GTK development libraries (to allow creating graphical windows)
-sudo apt-get install libgtk2.0-dev
+sudo apt-get -y install libgtk2.0-dev
+# Emacs and nano
+sudo apt-get -y install emacs nano
 
 # Refresh installed libraries (if error @GLIBCXX_3.4.20 occurs follow steps: https://askubuntu.com/a/409831
-sudo apt-get dist-upgrade
+sudo apt-get -y dist-upgrade
 
 #UPDATES AND OTHER INSTALLS DONE
 
@@ -77,6 +79,12 @@ sudo ldconfig
 rm -rf /tmp/libinstall
 #LIBS & INCLUDE SETUP DONE
 
+#GRIP SETUP
+cd
+wget -O grip.deb https://github.com/WPIRoboticsProjects/GRIP/releases/download/v1.5.2/grip-1.5.2-x64.deb
+sudo apt-get install ./grip.deb
+#GRIP SETUP DONE
+
 #ALIAS SETUP - CURRENTLY DISABLED
 #cd
 #rm ./.bash_aliases
@@ -89,7 +97,7 @@ cd
 cd ~/Desktop
 rm NURDVision.cpp
 wget https://github.com/FRCTeam3255/NURDVision/raw/master/NURDVision.cpp
-g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil
+g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -o runNURDVision
 #CODE SETUP DONE
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"

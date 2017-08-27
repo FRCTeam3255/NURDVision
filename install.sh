@@ -25,6 +25,8 @@ sudo apt-get -y install libeigen3-dev
 sudo apt-get -y install libglew1.6-dev
 # GTK development libraries (to allow creating graphical windows)
 sudo apt-get -y install libgtk2.0-dev
+# Emacs and nano
+sudo apt-get -y install emacs nano
 
 # Refresh installed libraries (if error @GLIBCXX_3.4.20 occurs follow steps: https://askubuntu.com/a/409831
 sudo apt-get -y dist-upgrade
@@ -89,7 +91,7 @@ cd
 cd ~/Desktop
 rm NURDVision.cpp
 wget https://github.com/FRCTeam3255/NURDVision/raw/master/NURDVision.cpp
-g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil
+g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -o runNURDVision
 #CODE SETUP DONE
 
 #RUN ON START UP SET UP
