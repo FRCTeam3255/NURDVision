@@ -167,7 +167,7 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 		double target1Distance = (OBJECT_AREA * FOCAL_LENGTH)/target1Area;
 		double target2Distance = (OBJECT_AREA * FOCAL_LENGTH)/target2Area;
 		avgDistance = (target1Distance+target2Distance)/2;
-		angle = midPointNormal.x;
+		angle = -midPointNormal.x;
 		
 		// Put text on image (used for debugging)
 		putText(output, "Final Target Data (Blue Dot):", Point2f(15, 1*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);

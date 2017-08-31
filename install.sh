@@ -18,7 +18,7 @@ sudo apt-get -y install build-essential make cmake cmake-curses-gui g++
 # libav video input/output development libraries
 sudo apt-get -y install libavformat-dev libavutil-dev libswscale-dev
 # Video4Linux camera development libraries
-sudo apt-get -y install libv4l-dev
+sudo apt-get -y install libv4l-dev v4l-utils
 # Eigen3 math development libraries
 sudo apt-get -y install libeigen3-dev
 # OpenGL development libraries (to allow creating graphical windows)
