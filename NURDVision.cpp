@@ -1,6 +1,6 @@
 // ===========================================================
 // NURDVision - FRC Team 3255 SuperNURD 2017 Vision Processing
-// written by Mike with help from Tayler
+// written by Mike and Tayler
 // ===========================================================
 
 #include <iostream>
@@ -14,7 +14,7 @@ using namespace cv;
 
 // FIRST Robotics Competition team number
 const int teamNumber = 3255;
-
+const int camerainput = 0;
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
@@ -29,9 +29,15 @@ const int teamNumber = 3255;
 
 // ========= Constants for SykoraBot ============//
 // Store an array: [0] = lower bound, [1] = upper bound
-const double Hue[] = {0, 180};
-const double Saturation[] = {0, 255};
-const double Luminance[] = {240, 255};
+//My laptop values
+const double Hue[] = {0, 13};
+const double Saturation[] = {0, 32};
+const double Luminance[] = {229, 255};
+//HSL VALUES FOR CAMERA WITH EXPOSURE SET AT 20; PASTE THIS COMMAND IN TO CHANGE EXPOSURE 'v4l2-ctl -c exposure_auto=(camera to change exposure of, most of the time 0 or 1) -c exposure_absolute=20' 
+//const double Hue[] = {55, 180};
+//const double Saturation[] = {165, 255};
+//const double Luminance[] = {23, 255};
+//
 //
 const double OBJECT_AREA = 18.5; //Area of the tracking tape in real life
 const double PIXEL_AREA = 8190; //Area of the pixels at base distance
@@ -47,9 +53,6 @@ const Scalar BLUE = Scalar(255, 0, 0);
 const Scalar YELLOW = Scalar(0, 255, 255);
 const Scalar WHITE = Scalar(255, 255, 255);
 // ========================================= //
-
-// Math to find the focal length of the camera
-const double FOCAL_LENGTH = (PIXEL_AREA * BASE_DISTANCE)/OBJECT_AREA;
 
 // Structure for sorting bounding boxes in descending size order
 struct {
@@ -160,25 +163,21 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 		// Draw a point at center of line drawn above
 		rectangle(output, tl, tr, BLUE, 3);
 		
-		// Calculate the normalized mid point
+		// Distance and angle calculation
 		Point2f midPointNormal = findXYOffset(midPoint, output.size());
-		double target1Area = target1.area();
-		double target2Area = target2.area();
-		double target1Distance = (OBJECT_AREA * FOCAL_LENGTH)/target1Area;
-		double target2Distance = (OBJECT_AREA * FOCAL_LENGTH)/target2Area;
-		avgDistance = (target1Distance+target2Distance)/2;
-		angle = -midPointNormal.x;
-		
+		double target1Width = target1.width;
+		double target2Width = target2.width;
+		double target1Height = target1.height;
+		double target2Height = target2.height;
+		avgDistance = 1000/((target1Width+target2Width)/2);
+
+		angle = target1Height - target2Height;
 		// Put text on image (used for debugging)
 		putText(output, "Final Target Data (Blue Dot):", Point2f(15, 1*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 		putText(output, "Angle: "+ to_string(angle), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 		putText(output, "Avg Distance: "+ to_string(avgDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 		
 		putText(output, "Debug Data:", Point2f(15, 5*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Distance Target 1: "+ to_string(target1Distance), Point2f(30,6*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Distance Target 2: "+ to_string(target2Distance), Point2f(30,7*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Area Target 1: "+ to_string(target1Area), Point2f(30, 8*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Area Target 2: "+ to_string(target2Area), Point2f(30, 9*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 	}
 }
 
@@ -253,9 +252,9 @@ int main(int argc, char *argv[]) {
 	if(local) NetworkTable::SetIPAddress("localhost");
 	
 	// Creates mats for storing image
-	Mat raw, processed;
+	Mat raw, processed, hslOutput;
 	// Starts video capture of camera 0;
-	VideoCapture capture(0);
+	VideoCapture capture(camerainput);
 	if (!capture.isOpened()) {
 		cerr << "\n\e[31mERROR! Unable to open camera\nERROR! Is the camera connected?\e[0m\n";
 		NetworkTable::Shutdown();
@@ -274,12 +273,15 @@ int main(int argc, char *argv[]) {
 		capture.read(raw);
 		// Runs image processing - pass mats raw, returns and stores mat processed, doubles distance and angle
 		processImage(raw, processed, distance, angle);
+		hslThreshold(raw, Hue, Saturation, Luminance, hslOutput);
 		// Publisheds Data to NetworkTable - Vision
 		PublishNetworkTables(ntable, distance, angle);
 		// Runs if debug is true
 		if(debug){
 			// Display processed image
 			imshow("Processed image", processed);
+			imshow("Raw Image", raw);
+			imshow("HSL Image", hslOutput);
 			// Output data to console
 			cout << "Distance: "<< distance << "\tAngle: " << angle << endl;
 		}
