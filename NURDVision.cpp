@@ -14,7 +14,7 @@ using namespace cv;
 
 // FIRST Robotics Competition team number
 const int teamNumber = 3255;
-const int camerainput = 0;
+const int camerainput = 1;
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
@@ -30,13 +30,10 @@ const int camerainput = 0;
 // ========= Constants for SykoraBot ============//
 // Store an array: [0] = lower bound, [1] = upper bound
 //My laptop values
-const double Hue[] = {0, 13};
-const double Saturation[] = {0, 32};
-const double Luminance[] = {229, 255};
 //HSL VALUES FOR CAMERA WITH EXPOSURE SET AT 20; PASTE THIS COMMAND IN TO CHANGE EXPOSURE 'v4l2-ctl -c exposure_auto=(camera to change exposure of, most of the time 0 or 1) -c exposure_absolute=20' 
-//const double Hue[] = {55, 180};
-//const double Saturation[] = {165, 255};
-//const double Luminance[] = {23, 255};
+const double Hue[] = {63, 113};
+const double Saturation[] = {236, 255};
+const double Luminance[] = {40, 80};
 //
 //
 const double OBJECT_AREA = 18.5; //Area of the tracking tape in real life
@@ -120,7 +117,7 @@ void showCrosshairs(Mat &input){
 }
 
 // Finds targets
-void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, double &avgDistance, double &angle){	
+void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, double &avgDistance, double &angle, double &offset){	
 	// Readys Output mat for contour use
 	output = Mat::zeros(imageInput.size(), CV_8UC3);
 	// Creates Vector of Bounding Boxes
@@ -158,6 +155,8 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 		Point2f tl(midPoint.x - 2, midPoint.y - 2);	// Calculate top-left point of center dot
 		Point2f tr(midPoint.x + 2, midPoint.y + 2); // Calculate bottom right point of center dot
 		
+		
+		
 		// Draw a line between center point of vision targets
 		line(output, centerPoint1, centerPoint2, RED, 1); 
 		// Draw a point at center of line drawn above
@@ -170,8 +169,14 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 		double target1Height = target1.height;
 		double target2Height = target2.height;
 		avgDistance = 1000/((target1Width+target2Width)/2);
+		offset = -midPointNormal.x;
 
-		angle = target1Height - target2Height;
+		if (centerPoint1.x > midPoint.x){
+			angle = target1Height - target2Height;	
+	    }
+		else{
+			angle = target2Height - target1Height;
+		}
 		// Put text on image (used for debugging)
 		putText(output, "Final Target Data (Blue Dot):", Point2f(15, 1*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 		putText(output, "Angle: "+ to_string(angle), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
@@ -182,9 +187,9 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 }
 
 // Does the image processing
-void processImage(Mat& input, Mat& output, double &distance, double &angle){
+void processImage(Mat& input, Mat& output,Mat& hslOutput , double &distance, double &angle, double &offset){
 	// Mats for processed outputs
-	Mat hslOutput, maskOutput, contoursImageOutput, targetsOutput;
+	Mat maskOutput, contoursImageOutput, targetsOutput;
 	// Create a HSL Mask
 	hslThreshold(input, Hue, Saturation, Luminance, hslOutput);
 	createMask(input, hslOutput, maskOutput);
@@ -195,7 +200,7 @@ void processImage(Mat& input, Mat& output, double &distance, double &angle){
 	createContours(maskOutput, contoursValueOutput);
 	
 	// Finds targets and passes back distance and angle
-	findTargets(maskOutput, contoursValueOutput, targetsOutput, distance, angle);
+	findTargets(maskOutput, contoursValueOutput, targetsOutput, distance, angle, offset);
 	output = targetsOutput;
 	
 	// Draw crosshairs on image
@@ -211,9 +216,11 @@ shared_ptr<NetworkTable> InitalizeNetworkTables(int teamNumber) {
 }
 
 //Publish Network Tables to table in use
-void PublishNetworkTables(shared_ptr<NetworkTable> table, double distance,double angle) {
+void PublishNetworkTables(shared_ptr<NetworkTable> table, double distance,double angle, double offset) {
 	table->PutNumber("Distance", distance);
 	table->PutNumber("Angle", angle);
+	table->PutNumber("offset x", offset);
+	cout << "Offset" << offset << endl;
 }
 
 // Returns true to quit when "ESC" is pressed
@@ -245,6 +252,8 @@ int main(int argc, char *argv[]) {
 	// Initalizes distance and angle to 0.0;
 	double distance = 0.0;
 	double angle = 0.0;
+	double offset = 0.0;
+
 	
 	//Initalizes Networktables
 	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables(teamNumber);
@@ -272,10 +281,9 @@ int main(int argc, char *argv[]) {
 		// Stores capture to raw mat
 		capture.read(raw);
 		// Runs image processing - pass mats raw, returns and stores mat processed, doubles distance and angle
-		processImage(raw, processed, distance, angle);
-		hslThreshold(raw, Hue, Saturation, Luminance, hslOutput);
+		processImage(raw, processed, hslOutput, distance, angle, offset);
 		// Publisheds Data to NetworkTable - Vision
-		PublishNetworkTables(ntable, distance, angle);
+		PublishNetworkTables(ntable, distance, angle, offset);
 		// Runs if debug is true
 		if(debug){
 			// Display processed image
@@ -283,7 +291,7 @@ int main(int argc, char *argv[]) {
 			imshow("Raw Image", raw);
 			imshow("HSL Image", hslOutput);
 			// Output data to console
-			cout << "Distance: "<< distance << "\tAngle: " << angle << endl;
+			cout << "Distance: "<< distance << "\tAngle: " << angle << "\tOffset: " << offset << endl;
 		}
 	}
 	NetworkTable::Shutdown();
