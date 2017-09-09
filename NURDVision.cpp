@@ -14,6 +14,7 @@ using namespace cv;
 
 // FIRST Robotics Competition team number
 const int teamNumber = 3255;
+// Camera input (default is 0 for jetson use)
 const int camerainput = 1;
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
@@ -220,7 +221,6 @@ void PublishNetworkTables(shared_ptr<NetworkTable> table, double distance,double
 	table->PutNumber("Distance", distance);
 	table->PutNumber("Angle", angle);
 	table->PutNumber("offset x", offset);
-	cout << "Offset" << offset << endl;
 }
 
 // Returns true to quit when "ESC" is pressed

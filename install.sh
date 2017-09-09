@@ -25,6 +25,8 @@ sudo apt-get -y install libeigen3-dev
 sudo apt-get -y install libglew1.6-dev
 # GTK development libraries (to allow creating graphical windows)
 sudo apt-get -y install libgtk2.0-dev
+# Screen
+sudo apt-get -y install screen
 # Emacs and nano
 sudo apt-get -y install emacs nano
 
