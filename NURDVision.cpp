@@ -18,6 +18,9 @@ using namespace cs;
 const int teamNumber = 3255;
 // Camera input (default is 0 for jetson use)
 const int camerainput = 0;
+// Port number of the stream (on jetson available at tegra-ubuntu.local:"streamPort" being the port below)
+const int streamPort = 1180;
+
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
@@ -222,7 +225,7 @@ shared_ptr<NetworkTable> InitalizeNetworkTables(int teamNumber) {
 void PublishNetworkTables(shared_ptr<NetworkTable> table, double distance,double angle, double offset) {
 	table->PutNumber("Distance", distance);
 	table->PutNumber("Angle", angle);
-	table->PutNumber("offset x", offset);
+	table->PutNumber("Offset", offset);
 }
 
 // Returns true to quit when "ESC" is pressed
@@ -255,9 +258,9 @@ int main(int argc, char *argv[]) {
 	double distance = 0.0;
 	double angle = 0.0;
 	double offset = 0.0;
-
+	
 	CvSource cvSource = CvSource("src", cs::VideoMode::PixelFormat::kMJPEG, 640, 480, 15);
-	MjpegServer cvMjpgServer = MjpegServer("server", 1180);
+	MjpegServer cvMjpgServer = MjpegServer("server", streamPort);
 	cvMjpgServer.SetSource(cvSource);
 	
 	//Initalizes Networktables
@@ -282,7 +285,7 @@ int main(int argc, char *argv[]) {
 		 << "Press ESC or Q to terminate\n" << endl;		
 	}	
 
-	cout << "MJpeg stream available at port " << (1180) << endl;
+	cout << "MJpeg stream available at port " << (streamPort) << endl;
 
 	// While the quit fucntion does not return true run image functions
 	while (!quit()) {
