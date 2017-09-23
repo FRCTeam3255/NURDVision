@@ -7,15 +7,17 @@
 #include <opencv2/opencv.hpp>
 #include <networktables/NetworkTable.h>
 #include <ntcore.h>
+#include <cscore.h>
 
 //'namespaces' are used basically before each command, so 'createMask' is actually cv::createMask. This removes need to do so.
 using namespace std;
 using namespace cv;
+using namespace cs;
 
 // FIRST Robotics Competition team number
 const int teamNumber = 3255;
 // Camera input (default is 0 for jetson use)
-const int camerainput = 1;
+const int camerainput = 0;
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
 // ========= Constants for Tape tracking ============//
 // Store an array: [0] = lower bound, [1] = upper bound
@@ -254,12 +256,15 @@ int main(int argc, char *argv[]) {
 	double angle = 0.0;
 	double offset = 0.0;
 
+	CvSource cvSource = CvSource("src", cs::VideoMode::PixelFormat::kMJPEG, 640, 480, 15);
+	MjpegServer cvMjpgServer = MjpegServer("server", 1180);
+	cvMjpgServer.SetSource(cvSource);
 	
 	//Initalizes Networktables
 	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables(teamNumber);
 	// If run argument -local is present, set ip address to localhost
 	if(local) NetworkTable::SetIPAddress("localhost");
-	
+
 	// Creates mats for storing image
 	Mat raw, processed, hslOutput;
 	// Starts video capture of camera 0;
@@ -276,6 +281,9 @@ int main(int argc, char *argv[]) {
 	cout << "VIEWER OPENED" << endl
 		 << "Press ESC or Q to terminate\n" << endl;		
 	}	
+
+	cout << "MJpeg stream available at port " << (1180) << endl;
+
 	// While the quit fucntion does not return true run image functions
 	while (!quit()) {
 		// Stores capture to raw mat
@@ -285,6 +293,9 @@ int main(int argc, char *argv[]) {
 		// Publisheds Data to NetworkTable - Vision
 		PublishNetworkTables(ntable, distance, angle, offset);
 		// Runs if debug is true
+		
+		cvSource.PutFrame(processed);
+
 		if(debug){
 			// Display processed image
 			imshow("Processed image", processed);
@@ -292,6 +303,7 @@ int main(int argc, char *argv[]) {
 			imshow("HSL Image", hslOutput);
 			// Output data to console
 			cout << "Distance: "<< distance << "\tAngle: " << angle << "\tOffset: " << offset << endl;
+			
 		}
 	}
 	NetworkTable::Shutdown();
