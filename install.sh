@@ -71,9 +71,11 @@ mkdir /tmp/libinstall
 cd /tmp/libinstall
 wget -O wpiutil.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/wpiutil/1.0.2/wpiutil-1.0.2-armhf.zip
 wget -O ntcore.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpilib/networktables/cpp/NetworkTables/3.1.7/NetworkTables-3.1.7-armhf.zip
+wget -O cscore.zip http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/cscore/cpp/cscore/1.0.2/cscore-1.0.2-armhf.zip
 
 unzip wpiutil.zip
 unzip ntcore.zip
+unzip cscore.zip
 
 sudo cp -r /tmp/libinstall/include/* /usr/local/include/
 sudo cp -r /tmp/libinstall/Linux/arm/* /usr/local/lib #use arm folder since JetsonTK1 is 32bit
@@ -92,7 +94,7 @@ cd
 cd ~/Desktop
 rm NURDVision.cpp
 wget https://github.com/FRCTeam3255/NURDVision/raw/master/NURDVision.cpp
-g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -o runNURDVision
+g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -lcscore -o runNURDVision
 #CODE SETUP DONE
 
 #RUN ON START UP SET UP

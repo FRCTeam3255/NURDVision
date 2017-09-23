@@ -1,3 +1,3 @@
-#! /bin/bash
-cd /home/ubuntu/Desktop/
+#! /bin/bash                                                                    
+cd ~/Desktop/
 ./runNURDVision
