@@ -1,6 +1,10 @@
 # NURDVision
 SuperNURDs implementation of vision co-processing on the Jetson TK1
 
+This is the runnable program and setup of NURDVision, to see a simple implementation example on an FRC Robot visit:
+
+**(Coming Soon)** [NURDVisionRobot GitHub]
+
 Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
 
 ## Table of contents
@@ -126,7 +130,9 @@ To make NURDVision communicate with a roboRIO other than FRC Team 3255's edit NU
 	
 	const int teamNumber = YOUR TEAM NUMBER;
 	
-We found that network tables are hosted on the ip: 10.28.39.43 port 1735
+We found that network tables are hosted on the ip: 10.te.am.43 port 1735
+
+When using the jetson, the camera stream is available at tegra-ubuntu.local:1180 (port number can be changed in the code)
 
 #### C++ Compiler arguments (nurdcompile)
 	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -lcscore -o runNURDVision
