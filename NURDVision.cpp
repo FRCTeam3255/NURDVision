@@ -19,6 +19,7 @@ const int teamNumber = 3255;
 // Camera input (default is 0 for jetson use)
 const int camerainput = 0;
 // Port number of the stream (on jetson available at tegra-ubuntu.local:"streamPort" being the port below)
+//		should be on the ip address of the device thats doing the processing, in our case the Jetson.
 const int streamPort = 1180;
 
 // Store a double array for both lower and upper boundaries of the hsl filter, decides what color you're looking for in the first mask
@@ -259,9 +260,11 @@ int main(int argc, char *argv[]) {
 	double angle = 0.0;
 	double offset = 0.0;
 	
-	CvSource cvSource = CvSource("src", cs::VideoMode::PixelFormat::kMJPEG, 640, 480, 15);
-	MjpegServer cvMjpgServer = MjpegServer("server", streamPort);
-	cvMjpgServer.SetSource(cvSource);
+	// Initalizes camera stream
+	CvSource stream = CvSource("stream", VideoMode::PixelFormat::kMJPEG, 640, 480, 30);
+	MjpegServer streamServer = MjpegServer("server", streamPort);
+	streamServer.SetSource(stream);
+	cout << "MJpeg stream available at port " << (streamPort) << endl;
 	
 	//Initalizes Networktables
 	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables(teamNumber);
@@ -283,9 +286,7 @@ int main(int argc, char *argv[]) {
 	if(debug){
 	cout << "VIEWER OPENED" << endl
 		 << "Press ESC or Q to terminate\n" << endl;		
-	}	
-
-	cout << "MJpeg stream available at port " << (streamPort) << endl;
+	}
 
 	// While the quit fucntion does not return true run image functions
 	while (!quit()) {
@@ -297,7 +298,7 @@ int main(int argc, char *argv[]) {
 		PublishNetworkTables(ntable, distance, angle, offset);
 		// Runs if debug is true
 		
-		cvSource.PutFrame(processed);
+		stream.PutFrame(processed);
 
 		if(debug){
 			// Display processed image
@@ -306,7 +307,6 @@ int main(int argc, char *argv[]) {
 			imshow("HSL Image", hslOutput);
 			// Output data to console
 			cout << "Distance: "<< distance << "\tAngle: " << angle << "\tOffset: " << offset << endl;
-			
 		}
 	}
 	NetworkTable::Shutdown();
