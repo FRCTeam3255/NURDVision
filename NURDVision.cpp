@@ -215,9 +215,9 @@ void processImage(Mat& input, Mat& output,Mat& hslOutput , double &distance, dou
 }
 
 //Initalize Network Tables to team 3255 and returns table to use
-shared_ptr<NetworkTable> InitalizeNetworkTables(int teamNumber) {
+shared_ptr<NetworkTable> InitalizeNetworkTables(int frcTeamNumber) {
 	NetworkTable::SetClientMode();
-	NetworkTable::SetTeam(teamNumber);
+	NetworkTable::SetTeam(frcTeamNumber);
 	NetworkTable::Initialize();
 	return NetworkTable::GetTable("NURDVision");
 }
@@ -264,7 +264,6 @@ int main(int argc, char *argv[]) {
 	CvSource stream = CvSource("stream", VideoMode::PixelFormat::kMJPEG, 640, 480, 30);
 	MjpegServer streamServer = MjpegServer("server", streamPort);
 	streamServer.SetSource(stream);
-	cout << "MJpeg stream available at port " << (streamPort) << endl;
 	
 	//Initalizes Networktables
 	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables(teamNumber);
@@ -283,6 +282,8 @@ int main(int argc, char *argv[]) {
 	
 	cout << "\nSTARTING IMAGE PROCESSING\n" << endl;
 	
+	cout << "MJpeg stream available at port " << (streamPort) << endl;
+	
 	if(debug){
 	cout << "VIEWER OPENED" << endl
 		 << "Press ESC or Q to terminate\n" << endl;		
@@ -294,12 +295,12 @@ int main(int argc, char *argv[]) {
 		capture.read(raw);
 		// Runs image processing - pass mats raw, returns and stores mat processed, doubles distance and angle
 		processImage(raw, processed, hslOutput, distance, angle, offset);
-		// Publisheds Data to NetworkTable - Vision
+		// Publishes Data to NetworkTable - Vision
 		PublishNetworkTables(ntable, distance, angle, offset);
-		// Runs if debug is true
-		
+		// Publishes processed image to stream
 		stream.PutFrame(processed);
 
+		// Runs if debug is true
 		if(debug){
 			// Display processed image
 			imshow("Processed image", processed);
