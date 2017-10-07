@@ -17,7 +17,7 @@ using namespace cs;
 // FIRST Robotics Competition team number
 const int teamNumber = 3255;
 // Camera input (default is 0 for jetson use)
-const int camerainput = 0;
+const int camerainput = 1;
 // Port number of the stream (on jetson available at tegra-ubuntu.local:"streamPort" being the port below)
 //		should be on the ip address of the device thats doing the processing, in our case the Jetson.
 const int streamPort = 1180;
@@ -38,14 +38,16 @@ const int streamPort = 1180;
 // Store an array: [0] = lower bound, [1] = upper bound
 //My laptop values
 //HSL VALUES FOR CAMERA WITH EXPOSURE SET AT 20; PASTE THIS COMMAND IN TO CHANGE EXPOSURE 'v4l2-ctl -c exposure_auto=(camera to change exposure of, most of the time 0 or 1) -c exposure_absolute=20' 
-const double Hue[] = {63, 113};
-const double Saturation[] = {236, 255};
-const double Luminance[] = {40, 80};
-//
+vector<double> Hue = {47, 96};
+vector<double> Saturation = {186, 255};
+vector<double> Luminance = {16, 129};
+//Asks if it should show the Raw Image over Networktables
 //
 const double OBJECT_AREA = 18.5; //Area of the tracking tape in real life
+const double OBJECT_WIDTH = 2;
 const double PIXEL_AREA = 8190; //Area of the pixels at base distance
-const double BASE_DISTANCE = 26; //Distance from camera to use as base for calucation
+const double BASE_DISTANCE = 36; //Distance from camera to use as base for calucation
+const double PIXEL_WIDTH = 40;
 // =================================================//
 
 // ============ Color Constants ============ //
@@ -58,6 +60,9 @@ const Scalar YELLOW = Scalar(0, 255, 255);
 const Scalar WHITE = Scalar(255, 255, 255);
 // ========================================= //
 
+//Focal length for camera/
+const double FOCAL_LENGTH = (PIXEL_WIDTH * BASE_DISTANCE)/OBJECT_WIDTH;
+
 // Structure for sorting bounding boxes in descending size order
 struct {
 	bool operator() (cv::Rect a, cv::Rect b) {
@@ -66,7 +71,7 @@ struct {
 } boundingBoxSortDescending;
 
 // Converts image to hsl filter, filtering out any color besides retroreflective tapes
-void hslThreshold(Mat &input, const double hue[], const double sat[], const double lum[], Mat &output) {
+void hslThreshold(Mat &input, vector<double>  hue, vector<double>  sat, vector<double>  lum, Mat &output) {
 	cvtColor(input, output, COLOR_BGR2HLS);
 	inRange(output, Scalar(hue[0], lum[0], sat[0]), Scalar(hue[1], lum[1], sat[1]), output);
 }
@@ -175,7 +180,8 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output, do
 		double target2Width = target2.width;
 		double target1Height = target1.height;
 		double target2Height = target2.height;
-		avgDistance = 1000/((target1Width+target2Width)/2);
+		double metricDistance = ((OBJECT_WIDTH * FOCAL_LENGTH)/(target1Width+target2Width))/2;
+		avgDistance = 3.9370*metricDistance;
 		offset = -midPointNormal.x;
 
 		if (centerPoint1.x > midPoint.x){
@@ -215,11 +221,11 @@ void processImage(Mat& input, Mat& output,Mat& hslOutput , double &distance, dou
 }
 
 //Initalize Network Tables to team 3255 and returns table to use
-shared_ptr<NetworkTable> InitalizeNetworkTables(int frcTeamNumber) {
+shared_ptr<NetworkTable> InitalizeNetworkTables(string tableName,int frcTeamNumber) {
 	NetworkTable::SetClientMode();
 	NetworkTable::SetTeam(frcTeamNumber);
 	NetworkTable::Initialize();
-	return NetworkTable::GetTable("NURDVision");
+	return NetworkTable::GetTable(tableName);
 }
 
 //Publish Network Tables to table in use
@@ -227,6 +233,12 @@ void PublishNetworkTables(shared_ptr<NetworkTable> table, double distance,double
 	table->PutNumber("Distance", distance);
 	table->PutNumber("Angle", angle);
 	table->PutNumber("Offset", offset);
+}
+
+void GetNetworkTables(shared_ptr<NetworkTable> table) {
+	Hue = table->GetNumberArray("hue", Hue);
+	Saturation = table->GetNumberArray("sat", Saturation);
+	Luminance = table->GetNumberArray("lum", Luminance);
 }
 
 // Returns true to quit when "ESC" is pressed
@@ -266,7 +278,8 @@ int main(int argc, char *argv[]) {
 	streamServer.SetSource(stream);
 	
 	//Initalizes Networktables
-	shared_ptr<NetworkTable> ntable = InitalizeNetworkTables(teamNumber);
+	shared_ptr<NetworkTable> visionTable = InitalizeNetworkTables("NURDVision", teamNumber);
+	shared_ptr<NetworkTable> preferenceTable = NetworkTable::GetTable("Preferences");
 	// If run argument -local is present, set ip address to localhost
 	if(local) NetworkTable::SetIPAddress("localhost");
 
@@ -296,9 +309,20 @@ int main(int argc, char *argv[]) {
 		// Runs image processing - pass mats raw, returns and stores mat processed, doubles distance and angle
 		processImage(raw, processed, hslOutput, distance, angle, offset);
 		// Publishes Data to NetworkTable - Vision
-		PublishNetworkTables(ntable, distance, angle, offset);
+		PublishNetworkTables(visionTable, distance, angle, offset);
+		// Gets array values for Hue Saturation and Luminance from preferences table
+		GetNetworkTables(preferenceTable);
+		//Checks robot preferences to see if raw images is called for
+		bool showRaw = preferenceTable->GetBoolean("showRaw", false);
 		// Publishes processed image to stream
-		stream.PutFrame(processed);
+		if(showRaw==true){
+			stream.PutFrame(raw);
+		}
+		else{
+			stream.PutFrame(processed);
+		}
+
+		cout << "\tHue" << Hue[0] << Hue[1] << endl;
 
 		// Runs if debug is true
 		if(debug){
@@ -307,7 +331,7 @@ int main(int argc, char *argv[]) {
 			imshow("Raw Image", raw);
 			imshow("HSL Image", hslOutput);
 			// Output data to console
-			cout << "Distance: "<< distance << "\tAngle: " << angle << "\tOffset: " << offset << endl;
+			cout << "Distance: "<< distance << "\tAngle: " << angle << "\tOffset: " << offset <<  endl;
 		}
 	}
 	NetworkTable::Shutdown();
