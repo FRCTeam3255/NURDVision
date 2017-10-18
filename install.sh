@@ -85,7 +85,7 @@ rm -rf /tmp/libinstall
 
 #ALIAS SETUP
 cd
-wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/nurdcommands.txt
+wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/alpha/nurdcommands.txt
 cat nurdcommands.txt >> .bash_aliases
 #ALIAS SETUP DONE
 
@@ -93,19 +93,19 @@ cat nurdcommands.txt >> .bash_aliases
 cd
 cd ~/Desktop
 rm NURDVision.cpp
-wget https://github.com/FRCTeam3255/NURDVision/raw/master/NURDVision.cpp
+wget https://github.com/FRCTeam3255/NURDVision/raw/alpha/NURDVision.cpp
 g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -lcscore -o runNURDVision
 #CODE SETUP DONE
 
 #RUN ON START UP SET UP
 # Sets NURDVision to run at startup
 cd /home/ubuntu/Desktop/
-sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/runscript.sh
+sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/alpha/runscript.sh
 (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/Desktop/runscript.sh") | crontab -
 # Disables desktop GUI running on the jetson, which slows down vision processing
 cd /etc/X11
 sudo rm default-display-manager
-sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/default-display-manager
+sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/alpha/default-display-manager
 #RUN ON START UP SET UP DONE
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"

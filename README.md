@@ -43,7 +43,7 @@ __Step 5__: Type lsusb into the ubuntu PC's console and check to make sure that 
 
 __Step 6__: Download flashJetson.run Type (and then click enter, password: ubuntu): 
 	
-	mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/master/flashJetson.run; bash ./flashJetson.run
+	mkdir jetsonInstall; cd jetsonInstall; wget https://github.com/FRCTeam3255/NURDVision/raw/alpha/flashJetson.run; bash ./flashJetson.run
 	
 ![s6](flashJetsonSteps/Step-6.png)
 
@@ -81,7 +81,7 @@ Alterantively this can be done via ssh (password ubuntu) by typing:
 
 __Step 1__: Download install.sh to jetson and run it. Type: 
 	
-	wget https://github.com/FRCTeam3255/NURDVision/raw/master/install.sh; bash ./install.sh
+	wget https://github.com/FRCTeam3255/NURDVision/raw/alpha/install.sh; bash ./install.sh
 
 (this may take a few hours)
 
@@ -98,7 +98,7 @@ Use these steps if you would like to develop and test on a Linux PC rather than 
 
 __Step 1__: Download install-pc.sh to your computer and run it. Type: 
 	
-	wget https://github.com/FRCTeam3255/NURDVision/raw/master/install-pc.sh; bash ./install-pc.sh
+	wget https://github.com/FRCTeam3255/NURDVision/raw/alpha/install-pc.sh; bash ./install-pc.sh
 
 (this may take a few hours)
 
