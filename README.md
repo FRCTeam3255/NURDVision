@@ -1,4 +1,5 @@
 # NURDVision Alpha
+## This is an archive. Development continued in [master branch](https://github.com/FRCTeam3255/NURDVision/tree/master)
 First SuperNURDs implementation of vision co-processing on the Jetson TK1
 
 This is the runnable program and setup of NURDVision, to see a simple implementation example on an FRC Robot visit:
