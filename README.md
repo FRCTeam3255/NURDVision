@@ -133,7 +133,13 @@ To make NURDVision communicate with a roboRIO other than FRC Team 3255's edit NU
 	
 We found that network tables are hosted on the ip: 10.te.am.43 port 1735
 
-When using the jetson, the camera stream is available at tegra-ubuntu.local:1180 (port number can be changed in the code)
+When using the jetson, the camera stream is available to view in browser at 
+	
+	tegra-ubuntu.local:1180 (port number can be changed in the code)
+	
+To access the camera stream from smart dashbaord, add a new MJPG Stream Viewer and use the address:
+
+	http://tegra-ubuntu.local:1180/stream.mjpg
 
 #### C++ Compiler arguments (nurdcompile)
 	g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -lcscore -o runNURDVision
