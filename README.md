@@ -18,9 +18,10 @@ Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-
 ### TO DO:
 - Add boiler vs peg detection
 - Have jetson send failed camera message to roborio
-- Add how to see jetson from roboRIO to read me.
+- Add java install and outline viewer/smartdashboard to pc install
 - Run NURDVision on Jetson boot (Check to see if working properly on fresh jetson)
 - Move readme conents to wiki pages (maybe)
+- ~~Add how to see jetson from roboRIO to read me.~~ **COMPLETED**
 - ~~Have HSL constants get data from robotPreferences or main code for tuning at competition~~ **COMPLETED**
 - ~~Implement CSCore to send video data to roborio/driverstation for tuning at competition~~ **COMPLETED**
 - ~~Implement network tables~~ **COMPLETED**
@@ -126,6 +127,10 @@ Any questions contact Mike at the SuperNURDs by leaving an issue report on our G
 The Jetson TK1 requires ARM-HF libraries, as such, those are the libraries installed with the install script.
 
 Our install script sets NURDVision to run at startup and disables desktop GUI running on the jetson, which slows down vision processing.
+
+To disabled auto exposure on Microsoft Live Cam run this code (included in runscript.sh) which sets exposures as dark as possible:
+
+	v4l2-ctl -c exposure_auto=0 -c exposure_absolute=01  
 
 To make NURDVision communicate with a roboRIO other than FRC Team 3255's edit NURDVision.cpp with either SSH or FTP and change
 	
