@@ -3,7 +3,7 @@ SuperNURDs implementation of vision co-processing on the Jetson TK1
 
 This is the runnable program and setup of NURDVision, to see a simple implementation example on an FRC Robot visit:
 
-**(Coming Soon)** [NURDVisionRobot GitHub]
+[NURDVisionRobot GitHub](https://github.com/FRCTeam3255/NURDVisionRobot)
 
 Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
 
