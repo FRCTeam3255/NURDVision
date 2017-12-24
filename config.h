@@ -16,11 +16,14 @@ const int streamPort = 1180;	// Port number of the video stream
 // ============================================ //
 								
 // ============== Stream Settings ============= //
-int resolutionWidth = 640;		// Horizontal Resolution for the camera stream
-int resolutionHeight = 480;		// Vertical Resolution for the camera stream
-int maxFrameRate = 30;			// Maximum frame rate for the camera strea
+const int resolutionWidth = 640;		// Horizontal Resolution for the camera stream
+const int resolutionHeight = 480;		// Vertical Resolution for the camera stream
+const int maxFrameRate = 30;			// Maximum frame rate for the camera strea
 // Please note: The FRC Field allows only limited bandwith per robot, rasing these values may go past that bandwith
-// ============================================ //							
+
+const bool showRawStream = false;				// By default (yes or no) show the raw, unprocessed camera stream over the network
+// This can be changed live and overriden using RobotPreferences or NetworkTables. 
+// ============================================ //
 
 // ======== Tracking Tape Caliberation ======== //
 const double OBJECT_WIDTH = 2; 	// Width (inches) of the tracking tape in real life
@@ -46,9 +49,9 @@ int minContourArcLength = 100;
 // Use these if you would like to code the values on the image processor rather than receive them from the RoboRIO
 // Store a double vector for both lower and upper bounds (in that respective order) of the hsl filter
 //	decides what color you're looking for in the first mask
-vector<double> hue = {47, 96};
-vector<double> saturation = {186, 255};
-vector<double> luminance = {16, 129};
+vector<double> hue = {0, 180};
+vector<double> saturation = {0, 255};
+vector<double> luminance = {255, 255};
 // ============================================ //
 
 // ============= Color Constants ============== //

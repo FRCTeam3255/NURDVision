@@ -207,7 +207,7 @@ void GetHSLValues(shared_ptr<NetworkTable> prefTable) {
 	hue = prefTable->GetNumberArray("hue", hue);
 	saturation = prefTable->GetNumberArray("sat", saturation);
 	luminance = prefTable->GetNumberArray("lum", luminance);
-	showRaw = prefTable->GetBoolean("showRaw", false);
+	showRaw = prefTable->GetBoolean("showRaw", showRawStream);
 }
 
 // Returns true to quit when "ESC" is pressed
