@@ -76,7 +76,7 @@ unzip ntcore.zip
 unzip cscore.zip
 
 sudo cp -r /tmp/libinstall/include/* /usr/local/include/
-sudo cp -r /tmp/libinstall/Linux/amd64/* /usr/local/lib #use arm folder since JetsonTK1 is 32bit
+sudo cp -r /tmp/libinstall/Linux/amd64/* /usr/local/lib #use amd64 folder for 64-bit linux
 sudo ldconfig
 rm -rf /tmp/libinstall
 #LIBS & INCLUDE SETUP DONE
