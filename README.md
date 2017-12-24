@@ -1,5 +1,6 @@
 # NURDVision
-**[Jetson Setup](https://github.com/FRCTeam3255/NURDVision/wiki/NVIDIA-Jetson-Setup) | 
+**[Documentation](https://github.com/FRCTeam3255/NURDVision/wiki/) | 
+[Jetson Setup](https://github.com/FRCTeam3255/NURDVision/wiki/NVIDIA-Jetson-Setup) | 
 [Jetson Installation](https://github.com/FRCTeam3255/NURDVision/wiki/Installation-on-Jetson) | 
 [PC Installation](https://github.com/FRCTeam3255/NURDVision/wiki/Installation-on-PC) | 
 [Notes and Info](https://github.com/FRCTeam3255/NURDVision/wiki/Notes-and-Info) | 
