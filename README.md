@@ -10,10 +10,10 @@
 
 **This code was primarily developed for use on a [NVIDIA Jetson TK1](http://www.nvidia.com/object/tegra-k1-processor.html) connected over a network to a [FIRST Robotics Competition](https://www.firstinspires.org/robotics/frc) Robot.**
 
+Please read our [wiki](https://github.com/FRCTeam3255/NURDVision/wiki/) for documentaion and tutorials on how to use NURDVision.
+
 **Note:** This is the runnable program and setup of NURDVision, to see a simple implementation example on an FRC Robot visit: 
 [NURDVisionRobot GitHub](https://github.com/FRCTeam3255/NURDVisionRobot)
-
-Major resource used - [SMblyRequired](https://github.com/SMblyRequired/Computer-Vision-2017)
 
 ### TO DO:
 - [ ] Add boiler vs peg detection
