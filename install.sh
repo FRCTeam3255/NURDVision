@@ -6,13 +6,14 @@ echo "$(tput bold)Starting $(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf
 #get ubuntu up to date and add repo
 
 sudo add-apt-repository universe
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test 
 sudo apt-get -y update
 sudo apt-get -y upgrade
 sudo apt-get -y dist-upgrade
 sudo apt-get -y autoremove
 
 # LibsSTDC++6 linking libraries (to compile NURDVision properly with g++)
-sudo apt-get -y install libstdc++6
+sudo apt-get -y install libstdc++6 
 # Some general development libraries
 sudo apt-get -y install build-essential make cmake cmake-curses-gui g++
 # libav video input/output development libraries
@@ -108,5 +109,15 @@ cd /etc/X11
 sudo rm default-display-manager
 sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/default-display-manager
 #RUN ON START UP SET UP DONE
+
+#DOUBLE CHECK UPDATES AND OTHER INSTALLS
+#get ubuntu up to date and add repo
+
+sudo add-apt-repository universe
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test 
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
