@@ -81,15 +81,9 @@ sudo ldconfig
 rm -rf /tmp/libinstall
 #LIBS & INCLUDE SETUP DONE
 
-#ALIAS SETUP
-cd
-wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/nurdcommands.txt
-cat nurdcommands.txt >> .bash_aliases
-#ALIAS SETUP DONE
-
 #DOUBLE CHECK UPDATES AND OTHER INSTALLS
 # Refresh installed libraries (if error @GLIBCXX_3.4.20 occurs follow steps: https://askubuntu.com/a/409831 or
-# https://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
+# https://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error)
 sudo add-apt-repository universe
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test 
 sudo apt-get -y update
@@ -108,10 +102,13 @@ g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d
 #CODE SETUP DONE
 
 #RUN ON START UP SET UP
-# Sets NURDVision to run at startup
+# Downloads runscript
 cd /home/ubuntu/Desktop/
 sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/runscript.sh
-(crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/Desktop/runscript.sh") | crontab -
+# Setsup aliases and sets to run NURDVision on startup
+cd
+wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/nurdcommands.txt
+cat nurdcommands.txt >> .bash_aliases
 # Disables desktop GUI running on the jetson, which slows down vision processing
 cd /etc/X11
 sudo rm default-display-manager

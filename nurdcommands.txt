@@ -1,4 +1,16 @@
 alias nurdcompile='cd ~/Desktop;g++ NURDVision.cpp -std=c++11 -lopencv_calib3d -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_video -lopencv_videoio -lopencv_videostab -lntcore -lwpiutil -lcscore -o runNURDVision; echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)Complied as runNURDVision$(tput sgr0)"'
-alias nurdrun='cd ~/Desktop;./runNURDVision'
+alias nurdshow='screen -r NURDVision'
+alias nurdrun='cd; source .bash_aliases'
 alias nurdget='cd ~/Desktop;rm NURDVision.cpp;wget https://github.com/FRCTeam3255/NURDVision/raw/master/NURDVision.cpp;rm config.h;wget https://github.com/FRCTeam3255/NURDVision/raw/master/config.h;echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)Downloaded successfully$(tput sgr0)"'
-alias nurdall='nurdget;nurdcompile;nurdrun -debug'
+alias nurdall='nurdget;nurdcompile;nurdrun'
+
+# Run NURDVision on boot
+bash /home/ubuntu/Desktop/runscript.sh
+sleep 1
+if screen -list | grep -q "NURDVision"; then
+	echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)is currently running! Type $(tput setaf 4)nurdshow$(tput setaf 2) to see console dialog$(tput sgr0)"
+	echo "$(tput bold)$(tput setaf 1)WHEN VIEWING NURDVision $(tput setaf 2)click \"ctrl-a\" then \"d\" to exit screen and keep NURDVision running, \"ctrl-c\" to quit$(tput sgr0)"
+else
+		  echo -e "$(tput bold)$(tput setaf 1)\n***ERROR*** \n\nNURDVision IS NOT RUNNING! \nCHECK IF THE CAMERA IS CONNECTED AND REBOOT\n$(tput setaf 1)\n***ERROR*** \n$(tput sgr0)"
+fi
+# Run NURDVision on boot end
