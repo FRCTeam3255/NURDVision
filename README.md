@@ -16,10 +16,9 @@ Please read our [wiki](https://github.com/FRCTeam3255/NURDVision/wiki/) for docu
 [NURDVisionRobot GitHub](https://github.com/FRCTeam3255/NURDVisionRobot)
 
 ### TO DO:
-- [ ] Add boiler vs peg detection
 - [ ] Have jetson send failed camera message to roborio
 - [ ] Add java install and outline viewer/smartdashboard to pc install
-- [ ] Run NURDVision on Jetson boot (Check to see if working properly on fresh jetson)
+- [x] Run NURDVision on Jetson boot (Check to see if working properly on fresh jetson)
 - [x] Move readme conents to wiki pages
 - [x] Add how to see jetson from roboRIO
 - [x] Have HSL constants get data from robotPreferences or main code for tuning at competition
