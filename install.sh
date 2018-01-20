@@ -31,9 +31,6 @@ sudo apt-get -y install screen
 # Emacs and nano
 sudo apt-get -y install emacs nano
 
-# Refresh installed libraries (if error @GLIBCXX_3.4.20 occurs follow steps: https://askubuntu.com/a/409831
-sudo apt-get -y dist-upgrade
-
 #UPDATES AND OTHER INSTALLS DONE
 
 #OPENCV SETUP
@@ -90,6 +87,17 @@ wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/nurdcommand
 cat nurdcommands.txt >> .bash_aliases
 #ALIAS SETUP DONE
 
+#DOUBLE CHECK UPDATES AND OTHER INSTALLS
+# Refresh installed libraries (if error @GLIBCXX_3.4.20 occurs follow steps: https://askubuntu.com/a/409831 or
+# https://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
+sudo add-apt-repository universe
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test 
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y dist-upgrade
+sudo apt-get -y autoremove
+#DOUBLE CHECK DONE
+
 #SETUP OUR CODE
 cd
 cd ~/Desktop
@@ -109,15 +117,5 @@ cd /etc/X11
 sudo rm default-display-manager
 sudo wget https://raw.githubusercontent.com/FRCTeam3255/NURDVision/master/default-display-manager
 #RUN ON START UP SET UP DONE
-
-#DOUBLE CHECK UPDATES AND OTHER INSTALLS
-#get ubuntu up to date and add repo
-
-sudo add-apt-repository universe
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test 
-sudo apt-get -y update
-sudo apt-get -y upgrade
-sudo apt-get -y dist-upgrade
-sudo apt-get -y autoremove
 
 echo "$(tput bold)$(tput setaf 4)NURD$(tput setaf 1)Vision $(tput setaf 2)installation complete"
