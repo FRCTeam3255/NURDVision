@@ -208,11 +208,13 @@ void PublishNetworkTables(shared_ptr<NetworkTable> table) {
 	table->PutBoolean("TargetFound", targetFound);
 }
 
-// Get values from for Hue, Saturation, Luminance from NetworkTables
+// Get values for configurable values from NetworkTables
 void GetHSLValues(shared_ptr<NetworkTable> prefTable) {
+	// HSL
 	hue = prefTable->GetNumberArray("Hue", hue);
 	saturation = prefTable->GetNumberArray("Saturation", saturation);
 	luminance = prefTable->GetNumberArray("Luminance", luminance);
+	
 	showRaw = prefTable->GetBoolean("showRaw", showRawStream);
 }
 
@@ -260,7 +262,6 @@ int main(int argc, char *argv[]) {
 	NetworkTable::SetTeam(teamNumber);
 	NetworkTable::Initialize();
 	auto visionTable = NetworkTable::GetTable("NURDVision");
-	auto preferenceTable = NetworkTable::GetTable("Preferences");
 		// If run argument -local is present, set ip address to localhost
 		if(local) NetworkTable::SetIPAddress("localhost");
 
@@ -286,8 +287,8 @@ int main(int argc, char *argv[]) {
 		// Publishes Data to NetworkTable - Vision
 		PublishNetworkTables(visionTable);
 		
-		// Gets array values for Hue Saturation and Luminance from preferences table
-		GetHSLValues(preferenceTable);
+		// Gets array values for Hue Saturation and Luminance from NURDVision table
+		GetHSLValues(visionTable);
 		
 		// Publishes processed image to stream (checks to see if asking for raw)
 		(showRaw ? stream.PutFrame(raw) : stream.PutFrame(processed));
