@@ -16,6 +16,7 @@ using namespace cs;
 double targetDistance = 0.0;
 double targetAngle = 0.0;
 double targetOffset = 0.0;
+bool targetFound = false;
 
 // Initalizes local, debug, and showRaw to false
 bool local = false;
@@ -157,6 +158,7 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 		double metricDistance = ((OBJECT_WIDTH * FOCAL_LENGTH)/(target1Width+target2Width))/2; // This is coincidentally in decameters
 		targetDistance = 3.9370*metricDistance; // Target's distance from robot (inches)
 		targetOffset = -offCenter.x; // Target's horizontal offset from center (no units)
+		targetFound = true;
 
 		if (centerPoint1.x > midPoint.x){
 			targetAngle = target1Height - target2Height;	
@@ -171,6 +173,9 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 		putText(output, "Distance: "+ to_string(targetDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 		
 		putText(output, "Debug Data:", Point2f(15, 5*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
+	}
+	else {
+		targetFound = false;
 	}
 }
 
@@ -200,13 +205,14 @@ void PublishNetworkTables(shared_ptr<NetworkTable> table) {
 	table->PutNumber("Distance", targetDistance);
 	table->PutNumber("Angle", targetAngle);
 	table->PutNumber("Offset", targetOffset);
+	table->PutBoolean("TargetFound", targetFound);
 }
 
 // Get values from for Hue, Saturation, Luminance from NetworkTables
 void GetHSLValues(shared_ptr<NetworkTable> prefTable) {
-	hue = prefTable->GetNumberArray("hue", hue);
-	saturation = prefTable->GetNumberArray("sat", saturation);
-	luminance = prefTable->GetNumberArray("lum", luminance);
+	hue = prefTable->GetNumberArray("Hue", hue);
+	saturation = prefTable->GetNumberArray("Saturation", saturation);
+	luminance = prefTable->GetNumberArray("Luminance", luminance);
 	showRaw = prefTable->GetBoolean("showRaw", showRawStream);
 }
 
