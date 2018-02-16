@@ -9,7 +9,7 @@
 
 // ============== Basic Settings ============== //
 const int teamNumber = 3255;	// FIRST Robotics Competition team number
-const int cameraInput = 0;		// Camera input (default is 0 for jetson use)
+const int cameraInput = 1;		// Camera input (default is 0 for jetson use)
 const int streamPort = 1180;	// Port number of the video stream
 								// 	(on jetson available at tegra-ubuntu.local:"streamPort" being the port below)
 								// 	should be on the ip address of the device thats doing the processing, in our case the Jetson.
@@ -36,6 +36,14 @@ const double FOCAL_LENGTH = 	//Focal length for camera
 	// (this can be replaced with a value if your camera's focal length is known
 // ============================================ //
 	
+// ======= Cascade Classifier Directory ======= //
+
+String cube_cascade_name = "cascade.xml";
+CascadeClassifier cube_cascade;
+RNG rng(12345);
+
+// ============================================ //
+
 // ========= Contour Filter Threshold ========= //
 // Lower and upper bound (in that respective order) threshold for contour filtering
 int contourWidth[] = {6, 1000000};
@@ -53,6 +61,8 @@ vector<double> hue = {55, 94};
 vector<double> saturation = {138, 255};
 vector<double> luminance = {28, 71};
 // ============================================ //
+
+
 
 // ============= Color Constants ============== //
 // You don't need to touch these 

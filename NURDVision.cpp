@@ -9,7 +9,11 @@
 #include <ntcore.h>
 #include <cscore.h>
 #include "config.h"
+#include <stdio.h>
 using namespace cs;
+
+
+
 
 // ============== GLOBAL VARIABLES ============== //
 // Initalizes targetDistance, targetAngle, and targetOffset to 0.0;
@@ -17,6 +21,8 @@ double targetDistance = 0.0;
 double targetAngle = 0.0;
 double targetOffset = 0.0;
 bool targetFound = false;
+double cubeDistance = 0.0;
+double cubeOffset = 0.0;
 
 // Initalizes local, debug, and showRaw to false
 bool local = false;
@@ -200,11 +206,29 @@ Mat processImage(Mat &input){
 	return targetsOutput;
 }
 
+Mat cascadeImage(Mat &input){
+  std::vector<Rect> cubes;
+  cube_cascade.detectMultiScale(input, cubes, 1.1, 2, 0|CASCADE_SCALE_IMAGE, Size(30, 30) );
+
+  for( size_t i = 0; i < cubes.size(); i++ )
+  {
+    Point center( cubes[i].x + cubes[i].width*0.5, cubes[i].y + cubes[i].height*0.5 );
+    ellipse( input, center, Size( cubes[i].width*0.5, cubes[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
+    
+    cubeDistance = cubes[i].width/6.4;
+    cubeOffset = -1 * (320-(cubes[i].x + cubes[i].width*0.5)) ;
+  }
+
+
+  return input;
+}
+
 // Publish Network Tables to table in use
 void PublishNetworkTables(shared_ptr<NetworkTable> table) {
 	table->PutNumber("Distance", targetDistance);
-	table->PutNumber("Angle", targetAngle);
 	table->PutNumber("Offset", targetOffset);
+	table->PutNumber("CubeDistance", cubeDistance);
+	table->PutNumber("CubeOffset", cubeOffset);
 	table->PutBoolean("TargetFound", targetFound);
 }
 
@@ -266,7 +290,7 @@ int main(int argc, char *argv[]) {
 		if(local) NetworkTable::SetIPAddress("localhost");
 
 	// Creates mats for storing image
-	Mat raw, processed;
+	Mat raw, processed, cascadeRaw, cascadeProcessed;
 
 	// Starts video capture of camera 0;
 	VideoCapture capture(cameraInput);
@@ -281,9 +305,12 @@ int main(int argc, char *argv[]) {
 		// Stores capture to raw mat
 		capture.read(raw);
 		
+   			if( !cube_cascade.load( cube_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
+		capture.read(cascadeRaw);
 		// Runs image processing and stores to processed
 		processed = processImage(raw);
-		
+		cascadeProcessed = cascadeImage(cascadeRaw);
+
 		// Publishes Data to NetworkTable - Vision
 		PublishNetworkTables(visionTable);
 		
@@ -291,13 +318,14 @@ int main(int argc, char *argv[]) {
 		GetHSLValues(visionTable);
 		
 		// Publishes processed image to stream (checks to see if asking for raw)
-		(showRaw ? stream.PutFrame(raw) : stream.PutFrame(processed));
+		(showRaw ? stream.PutFrame(raw) : stream.PutFrame(cascadeProcessed));
 	
 		// Runs if debug is true
 		if(debug){
 			// Display processed image
 			imshow("Processed image", processed);
 			imshow("Raw Image", raw);
+			imshow("Cascade Processed", cascadeProcessed);
 			// Output data to console
 			cout << "Distance: "<< targetDistance << "\tAngle: " << targetAngle << "\tOffset: " << targetOffset <<  endl;
 		}
