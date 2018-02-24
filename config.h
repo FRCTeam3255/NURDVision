@@ -57,9 +57,14 @@ int minContourArcLength = 100;
 // Use these if you would like to code the values on the image processor rather than receive them from the RoboRIO
 // Store a double vector for both lower and upper bounds (in that respective order) of the hsl filter
 //	decides what color you're looking for in the first mask
-vector<double> hue = {55, 94};
-vector<double> saturation = {138, 255};
-vector<double> luminance = {28, 71};
+vector<double> hue = {15, 33};
+vector<double> saturation = {238, 255};
+vector<double> luminance = {32, 134};
+
+
+vector<double> cubeHue = {15, 33};
+vector<double> cubeSaturation = {238, 255};
+vector<double> cubeLuminance = {32, 134};
 // ============================================ //
 
 
@@ -74,4 +79,5 @@ const Scalar GREEN = Scalar(0, 255, 0);
 const Scalar BLUE = Scalar(255, 0, 0);
 const Scalar YELLOW = Scalar(0, 255, 255);
 const Scalar WHITE = Scalar(255, 255, 255);
+const Scalar PURPLE = Scalar(255, 0, 233);
 // =========================================== //

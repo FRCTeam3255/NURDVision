@@ -52,15 +52,8 @@ struct {
 
 // Converts image to hsl filter, filtering out any color besides green on the retroreflective tapes
 void hslThreshold(Mat &input, Mat &output) {
-  input.convertTo(input, -1, 1, -25);
 	cvtColor(input, output, COLOR_BGR2HLS);
 	inRange(output, Scalar(hue[0], luminance[0], saturation[0]), Scalar(hue[1], luminance[1], saturation[1]), output);
-}
-
-
-void cubeHslThreshold(Mat &input, Mat &output) {
-	cvtColor(input, output, COLOR_BGR2HLS);
-	inRange(output, Scalar(cubeHue[0], cubeLuminance[0], cubeSaturation[0]), Scalar(cubeHue[1], cubeLuminance[1], cubeSaturation[1]), output);
 }
 
 // Creates a workable mask to a mat, so we can process the hsl filter
@@ -70,26 +63,8 @@ void createMask(Mat &input, Mat &mask, Mat &output) {
 	input.copyTo(output, mask);
 }
 
-void cubeCreateMask(Mat &input, Mat &mask, Mat &output) {
-	mask.convertTo(mask, CV_8UC1);
-	bitwise_xor(output, output, output);
-	input.copyTo(output, mask);
-}
-
 // Filters out contours 
 void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &output) {
-	output.clear();
-	for (vector<Point> contour : input) {
-		Rect contourBounding = boundingRect(contour);
-		if (contourBounding.width < contourWidth[0] || contourBounding.width > contourWidth[1]) continue;
-		if (contourBounding.height < contourHieght[0] || contourBounding.height > contourHieght[1]) continue;
-		if (contourArea(contour) < minContourArea) continue;
-		if (arcLength(contour, true) < minContourArcLength) continue;
-		output.push_back(contour);
- 	}
-}
-
-void cubeFilterContours(vector<vector<Point> > &input, vector<vector<Point> > &output) {
 	output.clear();
 	for (vector<Point> contour : input) {
 		Rect contourBounding = boundingRect(contour);
@@ -113,19 +88,6 @@ vector<vector<Point> > createContours(Mat &input){
 	filterContours(contoursInput, contoursOutput);
 	return contoursOutput;
 }
-
-vector<vector<Point> > cubeCreateContours(Mat &input){
-	// Create new vectors for storing contour values
-	vector<vector<Point> > cubeContoursInput, cubeContoursOutput;
-	// Converts our hsl filter into black and white, because findContours requires you to be using black and white, not RGB or HSL	
-	cvtColor(input, input, CV_RGB2GRAY);
-	// Finds the contours of the image
-	findContours(input, cubeContoursInput, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	// Filters out contours based on width, height, and area.
-	//cubeFilterContours(cubeContoursInput, cubeContoursOutput);
-	return cubeContoursInput;
-}
-
 // ============== Filtering END ============== //
 
 
@@ -223,52 +185,12 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 	}
 }
 
-void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){	
-	// Readys Output mat for contour use
-	output = Mat::zeros(imageInput.size(), CV_8UC3);
-	// Creates Vector of Bounding Boxes
-	vector<Rect> boundingBoxes(input.size());
-	
-	// Finds all the targets
-	for (int i = 0; i< input.size(); i++) {
-		// Makes contours rectanges and stores rectangles into bounding box vector.
-		boundingBoxes[i] = boundingRect(input[i]);
-		// Draws contours onto output
-		drawContours(output, input, i, SKY_BLUE, 2);
-	}
-	
-	// If there are 1 or more targets found
-	if (boundingBoxes.size() >= 1) {
-		// Sort rectangles in descending order based on their area.
-		sort(boundingBoxes.begin(), boundingBoxes.end(), boundingBoxSortDescending); 
-
-		// Pick out the biggest target found.
-		Rect cube = boundingBoxes[0];
-		
-		//Draws rectangle onto output
-		rectangle(output, cube, PURPLE, 2);
-		
-		// Calculate center point
-		Point2f centerPoint1 = centerPoint(cube);	
-
-    cubeDistance = 13*620/cube.width;
-    cubeOffset = -1 * (320-(cube.x + cube.width*0.5)) ;
-
-		putText(output, "Offset: "+ to_string(cubeOffset), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Distance: "+ to_string(cubeDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		
-		}
-	else {
-		targetFound = false;
-	}
-}
-
 // ============== Targeting END ============== //
 
 // Processes the image and returns a processed image
 Mat processImage(Mat &input){
 	// Mats for processed outputs
-	Mat hslOutput, maskOutput, targetsOutput;
+	Mat hslOutput, maskOutput, contoursImageOutput, targetsOutput;
 	// Create a HSL Mask
 	hslThreshold(input, hslOutput);
 	createMask(input, hslOutput, maskOutput);
@@ -284,17 +206,26 @@ Mat processImage(Mat &input){
 	return targetsOutput;
 }
 
-Mat cubeProcessImage(Mat &input){
-  Mat cubeHslOutput, cubeMaskOutput, cubeTargetsOutput;
+Mat cascadeImage(Mat &input){
+  std::vector<Rect> cubes;
+  Mat frame_gray, hist, bright;
+  input.convertTo(bright, -1, 25, 1);
+  cvtColor(bright, frame_gray, CV_BGR2GRAY );
+  equalizeHist( frame_gray, hist );
 
-  cubeHslThreshold(input, cubeHslOutput);
-  cubeCreateMask(input, cubeHslOutput, cubeMaskOutput);
-  auto cubeContoursValueOutput = cubeCreateContours(cubeMaskOutput);
+  cube_cascade.detectMultiScale(hist, cubes, 1.1, 4.5, 0|CASCADE_SCALE_IMAGE, Size(30, 30) );
 
-  cubeFindTargets(cubeMaskOutput, cubeContoursValueOutput, cubeTargetsOutput);
+  for( size_t i = 0; i < cubes.size(); i++ )
+  {
+    Point center( cubes[i].x + cubes[i].width*0.5, cubes[i].y + cubes[i].height*0.5 );
+    ellipse( hist, center, Size( cubes[i].width*0.5, cubes[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
+    
+    cubeDistance = 13*620/cubes[i].width;
+    cubeOffset = -1 * (320-(cubes[i].x + cubes[i].width*0.5)) ;
+  }
 
-  showCrosshairs(cubeTargetsOutput);
-  return cubeTargetsOutput;
+
+  return hist;
 }
 
 // Publish Network Tables to table in use
@@ -312,11 +243,6 @@ void GetHSLValues(shared_ptr<NetworkTable> prefTable) {
 	hue = prefTable->GetNumberArray("Hue", hue);
 	saturation = prefTable->GetNumberArray("Saturation", saturation);
 	luminance = prefTable->GetNumberArray("Luminance", luminance);
-
-
-	cubeHue = prefTable->GetNumberArray("Cube Hue", cubeHue);
-	cubeSaturation = prefTable->GetNumberArray("Cube Saturation", cubeSaturation);
-	cubeLuminance = prefTable->GetNumberArray("Cube Luminance", cubeLuminance);
 	
 	showRaw = prefTable->GetBoolean("showRaw", showRawStream);
 }
@@ -389,7 +315,7 @@ int main(int argc, char *argv[]) {
 		capture.read(cascadeRaw);
 		// Runs image processing and stores to processed
 		processed = processImage(raw);
-		cascadeProcessed = cubeProcessImage(cascadeRaw);
+		cascadeProcessed = cascadeImage(cascadeRaw);
 
 		// Publishes Data to NetworkTable - Vision
 		PublishNetworkTables(visionTable);
