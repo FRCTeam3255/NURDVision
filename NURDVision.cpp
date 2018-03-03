@@ -10,6 +10,7 @@
 #include <cscore.h>
 #include "config.h"
 #include <stdio.h>
+#include <cmath>
 using namespace cs;
 
 
@@ -122,8 +123,9 @@ vector<vector<Point> > cubeCreateContours(Mat &input){
 	// Finds the contours of the image
 	findContours(input, cubeContoursInput, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	// Filters out contours based on width, height, and area.
+	filterContours(cubeContoursInput, cubeContoursOutput);
 	//cubeFilterContours(cubeContoursInput, cubeContoursOutput);
-	return cubeContoursInput;
+	return cubeContoursOutput;
 }
 
 // ============== Filtering END ============== //
@@ -135,16 +137,6 @@ Point2f centerPoint(Rect rect) {
 	return Point2f(rect.x + (rect.width / 2), rect.y + (rect.height / 2));
 }
 
-// Finds offset from center point and returns is
-double findOffset(double position, double resolution) {
-	return (position - (resolution / 2)) / (resolution / 2);
-}
-
-// Finds x and y offsets and returns them
-Point2f findXYOffset(Point2f point, Size res) {
-	return Point2f(findOffset(point.x, (double)res.width), findOffset(point.y, (double)res.height));
-}
-
 // Shows crosshairs
 void showCrosshairs(Mat &input){
 	line(input, Point(input.cols / 2, 0), Point(input.cols / 2, input.rows), WHITE, 1);
@@ -152,9 +144,9 @@ void showCrosshairs(Mat &input){
 }
 
 // Finds targets
-void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){	
+void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &joinedOutput){	
 	// Readys Output mat for contour use
-	output = Mat::zeros(imageInput.size(), CV_8UC3);
+	joinedOutput = Mat::zeros(imageInput.size(), CV_8UC3);
 	// Creates Vector of Bounding Boxes
 	vector<Rect> boundingBoxes(input.size());
 	
@@ -163,9 +155,8 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 		// Makes contours rectanges and stores rectangles into bounding box vector.
 		boundingBoxes[i] = boundingRect(input[i]);
 		// Draws contours onto output
-		drawContours(output, input, i, SKY_BLUE, 2);
-	}
-	
+		drawContours(joinedOutput, input, i, SKY_BLUE, 2);
+	}	
 	// If there are 2 or more targets found
 	if (boundingBoxes.size() >= 2) {
 		// Sort rectangles in descending order based on their area.
@@ -176,8 +167,8 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 		Rect target2 = boundingBoxes[1];
 		
 		//Draws two rectanges onto output
-		rectangle(output, target1, GREEN, 2);
-		rectangle(output, target2, GREEN, 2);
+		rectangle(joinedOutput, target1, GREEN, 2);
+		rectangle(joinedOutput, target2, GREEN, 2);
 		
 		// Calculate center point of both targets
 		Point2f centerPoint1 = centerPoint(target1);	
@@ -189,19 +180,46 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 		Point2f tr(midPoint.x + 2, midPoint.y + 2); // Calculate bottom right point of center dot
 		
 		// Draw a line between center point of vision targets
-		line(output, centerPoint1, centerPoint2, RED, 1); 
+		line(joinedOutput, centerPoint1, centerPoint2, RED, 1); 
 		// Draw a point at center of line drawn above
-		rectangle(output, tl, tr, BLUE, 3);
+		rectangle(joinedOutput, tl, tr, BLUE, 3);
 		
 		// Distance, angle, and offset calculation
-		Point2f offCenter = findXYOffset(midPoint, output.size()); // Calculates x and y offset from center
 		double target1Width = target1.width;
 		double target2Width = target2.width;
 		double target1Height = target1.height;
 		double target2Height = target2.height;
 		double metricDistance = ((OBJECT_WIDTH * FOCAL_LENGTH)/(target1Width+target2Width))/2; // This is coincidentally in decameters
 		targetDistance = 3.9370*metricDistance; // Target's distance from robot (inches)
-		targetOffset = -offCenter.x; // Target's horizontal offset from center (no units)
+		double target1Distance = 2*1106/target1Width;
+		double target2Distance = 2*1106/target2Width;
+		double target1B = (centerPoint1.x - (imageInput.cols/2)) * 1/(target1Width/1);
+		double target1C = target1Distance;
+		double target1A = sqrt(abs(pow(target1C,2)-pow(target1B,2)));
+		double target1Rads = atan(target1B/target1A);
+		double target1Offset = 57.3 * target1Rads;
+		if ((imageInput.cols/2)>centerPoint1.x){
+			target1Offset = -target1Offset;
+
+		}
+
+
+		double target2B = (centerPoint1.x - (imageInput.cols/2)) * 1/(target1Width/1);
+		double target2C = target2Distance;
+		double target2A = sqrt(abs( pow(target2C,2) - pow(target2B,2) ));
+
+		double target2Rads = atan(target2B/target2A);
+		double target2Offset = 57.3 * target2Rads;
+		if ((imageInput.cols/2)>centerPoint2.x){
+			target2Offset = -target2Offset;
+
+		}
+		targetOffset = (target1Offset+target2Offset)/2;
+
+		cout << "offset " << targetOffset << endl;
+		//cout << target1Distance << " 1dist 1wid " << target1Width << endl;
+
+
 		targetFound = true;
 
 		if (centerPoint1.x > midPoint.x){
@@ -212,20 +230,18 @@ void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){
 		}
 		
 		// Put text on image (used for debugging)
-		putText(output, "Final Target Data (Blue Dot):", Point2f(15, 1*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Angle: "+ to_string(targetAngle), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Distance: "+ to_string(targetDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
+		putText(joinedOutput, "Offset: "+ to_string(targetOffset), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
+		putText(joinedOutput, "Distance: "+ to_string(targetDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 		
-		putText(output, "Debug Data:", Point2f(15, 5*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 	}
 	else {
 		targetFound = false;
 	}
 }
 
-void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){	
+void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &joinedOutput){	
 	// Readys Output mat for contour use
-	output = Mat::zeros(imageInput.size(), CV_8UC3);
+	joinedOutput = Mat::zeros(imageInput.size(), CV_8UC3);
 	// Creates Vector of Bounding Boxes
 	vector<Rect> boundingBoxes(input.size());
 	
@@ -234,7 +250,7 @@ void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output
 		// Makes contours rectanges and stores rectangles into bounding box vector.
 		boundingBoxes[i] = boundingRect(input[i]);
 		// Draws contours onto output
-		drawContours(output, input, i, SKY_BLUE, 2);
+		drawContours(joinedOutput, input, i, SKY_BLUE, 2);
 	}
 	
 	// If there are 1 or more targets found
@@ -246,16 +262,16 @@ void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output
 		Rect cube = boundingBoxes[0];
 		
 		//Draws rectangle onto output
-		rectangle(output, cube, PURPLE, 2);
+		rectangle(joinedOutput, cube, PURPLE, 2);
 		
 		// Calculate center point
-		Point2f centerPoint1 = centerPoint(cube);	
+		Point2f cubeCenter = centerPoint(cube);	
 
     cubeDistance = 13*620/cube.width;
-    cubeOffset = -1 * (320-(cube.x + cube.width*0.5)) ;
+    cubeOffset = cubeCenter.x ;
 
-		putText(output, "Offset: "+ to_string(cubeOffset), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(output, "Distance: "+ to_string(cubeDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
+		putText(joinedOutput, "Offset: "+ to_string(cubeOffset), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
+		putText(joinedOutput, "Distance: "+ to_string(cubeDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
 		
 		}
 	else {
@@ -269,33 +285,27 @@ void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output
 Mat processImage(Mat &input){
 	// Mats for processed outputs
 	Mat hslOutput, maskOutput, targetsOutput;
+  Mat cubeHslOutput, cubeMaskOutput, cubeTargetsOutput;
+  Mat joinedOutput;
 	// Create a HSL Mask
 	hslThreshold(input, hslOutput);
+	cubeHslThreshold(input, cubeHslOutput);
+	
+
+
+	cubeCreateMask(input, cubeHslOutput, cubeMaskOutput);
 	createMask(input, hslOutput, maskOutput);
 	
-	// Create Contours
 	auto contoursValueOutput = createContours(maskOutput);
+	auto cubeContoursValueOutput = cubeCreateContours(cubeMaskOutput);
 	
-	// Finds targets and passes back distance and targetAngle
-	findTargets(maskOutput, contoursValueOutput, targetsOutput);
+  cubeFindTargets(cubeMaskOutput, cubeContoursValueOutput, joinedOutput);
+	findTargets(maskOutput, contoursValueOutput, joinedOutput);
 	
-	// Draw crosshairs on image
-	showCrosshairs(targetsOutput);
-	return targetsOutput;
-}
-
-Mat cubeProcessImage(Mat &input){
-  Mat cubeHslOutput, cubeMaskOutput, cubeTargetsOutput;
-
-  cubeHslThreshold(input, cubeHslOutput);
-  cubeCreateMask(input, cubeHslOutput, cubeMaskOutput);
-  auto cubeContoursValueOutput = cubeCreateContours(cubeMaskOutput);
-
-  cubeFindTargets(cubeMaskOutput, cubeContoursValueOutput, cubeTargetsOutput);
-
-  showCrosshairs(cubeTargetsOutput);
-  return cubeTargetsOutput;
-}
+	showCrosshairs(joinedOutput);
+  
+  return joinedOutput;
+  }
 
 // Publish Network Tables to table in use
 void PublishNetworkTables(shared_ptr<NetworkTable> table) {
@@ -369,8 +379,7 @@ int main(int argc, char *argv[]) {
 		if(local) NetworkTable::SetIPAddress("localhost");
 
 	// Creates mats for storing image
-	Mat raw, processed, cascadeRaw, cascadeProcessed;
-
+	Mat raw, processed;
 	// Starts video capture of camera 0;
 	VideoCapture capture(cameraInput);
 	if (!capture.isOpened()) {
@@ -385,26 +394,20 @@ int main(int argc, char *argv[]) {
 		// Stores capture to raw mat
 		capture.read(raw);
 		
-   			if( !cube_cascade.load( cube_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
-		capture.read(cascadeRaw);
 		// Runs image processing and stores to processed
 		processed = processImage(raw);
-		cascadeProcessed = cubeProcessImage(cascadeRaw);
-
+		
 		// Publishes Data to NetworkTable - Vision
 		PublishNetworkTables(visionTable);
 		
 		// Gets array values for Hue Saturation and Luminance from NURDVision table
 		GetHSLValues(visionTable);
 		// Publishes processed image to stream (checks to see if asking for raw)
-		(showRaw ? stream.PutFrame(raw) : stream.PutFrame(raw));
+		(showRaw ? stream.PutFrame(raw) : stream.PutFrame(processed));
 	
 		// Runs if debug is true
 		if(debug){
 			// Display processed image
-			imshow("Processed image", processed);
-			imshow("Raw Image", raw);
-			imshow("Cascade Processed", cascadeProcessed);
 			// Output data to console
 			cout << "Distance: "<< targetDistance << "\tAngle: " << targetAngle << "\tOffset: " << targetOffset <<  endl;
 		}
