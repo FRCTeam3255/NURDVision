@@ -25,24 +25,6 @@ const bool showRawStream = false;				// By default (yes or no) show the raw, unp
 // This can be changed live and overriden using RobotPreferences or NetworkTables. 
 // ============================================ //
 
-// ======== Tracking Tape Caliberation ======== //
-const double OBJECT_WIDTH = 2; 	// Width (inches) of the tracking tape in real life
-const double BASE_DISTANCE = 36;// Distance (inches) from camera to use as base for calucation
-const double PIXEL_WIDTH = 40; 	// Width (inches) of the pixels at base distance
-
-
-const double FOCAL_LENGTH = 	//Focal length for camera
-	(PIXEL_WIDTH * BASE_DISTANCE)/OBJECT_WIDTH; 
-	// (this can be replaced with a value if your camera's focal length is known
-// ============================================ //
-	
-// ======= Cascade Classifier Directory ======= //
-
-String cube_cascade_name = "cascade.xml";
-CascadeClassifier cube_cascade;
-RNG rng(12345);
-
-// ============================================ //
 
 // ========= Contour Filter Threshold ========= //
 // Lower and upper bound (in that respective order) threshold for contour filtering
@@ -57,14 +39,11 @@ int minContourArcLength = 100;
 // Use these if you would like to code the values on the image processor rather than receive them from the RoboRIO
 // Store a double vector for both lower and upper bounds (in that respective order) of the hsl filter
 //	decides what color you're looking for in the first mask
-vector<double> hue = {53, 180};
-vector<double> saturation = {174, 255};
-vector<double> luminance = {60, 75};
 
 
-vector<double> cubeHue = {16, 47};
-vector<double> cubeSaturation = {131, 255};
-vector<double> cubeLuminance = {41, 80};
+vector<double> cubeHue = {13, 36};
+vector<double> cubeSaturation = {255, 255};
+vector<double> cubeLuminance = {11, 58};
 // ============================================ //
 
 

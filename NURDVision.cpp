@@ -1,8 +1,7 @@
 // ===========================================================
-// NURDVision - FRC Team 3255 SuperNURD 2017 Vision Processing
+// NURDVision - FRC Team 3255 SuperNURD 2018 Cube Detection
 // written by Mike and Tayler
 // ===========================================================
-
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <networktables/NetworkTable.h>
@@ -10,25 +9,19 @@
 #include <cscore.h>
 #include "config.h"
 #include <stdio.h>
-#include <cmath>
 using namespace cs;
 
-
-
-
 // ============== GLOBAL VARIABLES ============== //
-// Initalizes targetDistance, targetAngle, and targetOffset to 0.0;
-double targetDistance = 0.0;
-double targetAngle = 0.0;
-double targetOffset = 0.0;
-bool targetFound = false;
+// Initalizes cubeDistance, cubeOffset, and Target Found
 double cubeDistance = 0.0;
 double cubeOffset = 0.0;
+bool targetFound = false;
 
-// Initalizes local, debug, and showRaw to false
+// Initalizes local, debug, and showRaw
 bool local = false;
 bool debug = false;
 bool showRaw = false;
+
 // ============================================== //
 
 // Checks the parameters passed by the command line execution
@@ -51,45 +44,20 @@ struct {
 	}
 } boundingBoxSortDescending;
 
-// Converts image to hsl filter, filtering out any color besides green on the retroreflective tapes
-void hslThreshold(Mat &input, Mat &output) {
-  input.convertTo(input, -1, 1, -25);
-	cvtColor(input, output, COLOR_BGR2HLS);
-	inRange(output, Scalar(hue[0], luminance[0], saturation[0]), Scalar(hue[1], luminance[1], saturation[1]), output);
-}
-
-
+// Filters image into HSL filter
 void cubeHslThreshold(Mat &input, Mat &output) {
 	cvtColor(input, output, COLOR_BGR2HLS);
 	inRange(output, Scalar(cubeHue[0], cubeLuminance[0], cubeSaturation[0]), Scalar(cubeHue[1], cubeLuminance[1], cubeSaturation[1]), output);
 }
 
-// Creates a workable mask to a mat, so we can process the hsl filter
-void createMask(Mat &input, Mat &mask, Mat &output) {
-	mask.convertTo(mask, CV_8UC1);
-	bitwise_xor(output, output, output);
-	input.copyTo(output, mask);
-}
-
+// Masks the HSL Filter, getting rid of non Cube-Hue'd objects
 void cubeCreateMask(Mat &input, Mat &mask, Mat &output) {
 	mask.convertTo(mask, CV_8UC1);
 	bitwise_xor(output, output, output);
 	input.copyTo(output, mask);
 }
 
-// Filters out contours 
-void filterContours(vector<vector<Point> > &input, vector<vector<Point> > &output) {
-	output.clear();
-	for (vector<Point> contour : input) {
-		Rect contourBounding = boundingRect(contour);
-		if (contourBounding.width < contourWidth[0] || contourBounding.width > contourWidth[1]) continue;
-		if (contourBounding.height < contourHieght[0] || contourBounding.height > contourHieght[1]) continue;
-		if (contourArea(contour) < minContourArea) continue;
-		if (arcLength(contour, true) < minContourArcLength) continue;
-		output.push_back(contour);
- 	}
-}
-
+//Filters Contours found by cubeCreateContours, currently not called
 void cubeFilterContours(vector<vector<Point> > &input, vector<vector<Point> > &output) {
 	output.clear();
 	for (vector<Point> contour : input) {
@@ -102,19 +70,7 @@ void cubeFilterContours(vector<vector<Point> > &input, vector<vector<Point> > &o
  	}
 }
 
-// Creates contours and returns a vector of contour points
-vector<vector<Point> > createContours(Mat &input){
-	// Create new vectors for storing contour values
-	vector<vector<Point> > contoursInput, contoursOutput;
-	// Converts our hsl filter into black and white, because findContours requires you to be using black and white, not RGB or HSL	
-	cvtColor(input, input, CV_RGB2GRAY);
-	// Finds the contours of the image
-	findContours(input, contoursInput, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	// Filters out contours based on width, height, and area.
-	filterContours(contoursInput, contoursOutput);
-	return contoursOutput;
-}
-
+//Finds all current Contours in the image
 vector<vector<Point> > cubeCreateContours(Mat &input){
 	// Create new vectors for storing contour values
 	vector<vector<Point> > cubeContoursInput, cubeContoursOutput;
@@ -123,125 +79,27 @@ vector<vector<Point> > cubeCreateContours(Mat &input){
 	// Finds the contours of the image
 	findContours(input, cubeContoursInput, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	// Filters out contours based on width, height, and area.
-	filterContours(cubeContoursInput, cubeContoursOutput);
 	//cubeFilterContours(cubeContoursInput, cubeContoursOutput);
+	cubeFilterContours(cubeContoursInput, cubeContoursOutput);
 	return cubeContoursOutput;
 }
 
-// ============== Filtering END ============== //
 
-
-// ============== Targeting ============== //
-// Finds Center point
-Point2f centerPoint(Rect rect) {
-	return Point2f(rect.x + (rect.width / 2), rect.y + (rect.height / 2));
-}
-
-// Shows crosshairs
+// Draws Crosshairs onto the final image shown
 void showCrosshairs(Mat &input){
 	line(input, Point(input.cols / 2, 0), Point(input.cols / 2, input.rows), WHITE, 1);
 	line(input, Point(0, input.rows / 2), Point(input.cols, input.rows / 2), WHITE, 1);
 }
 
-// Finds targets
-void findTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &joinedOutput){	
-	// Readys Output mat for contour use
-	joinedOutput = Mat::zeros(imageInput.size(), CV_8UC3);
-	// Creates Vector of Bounding Boxes
-	vector<Rect> boundingBoxes(input.size());
-	
-	// Finds all the targets
-	for (int i = 0; i< input.size(); i++) {
-		// Makes contours rectanges and stores rectangles into bounding box vector.
-		boundingBoxes[i] = boundingRect(input[i]);
-		// Draws contours onto output
-		drawContours(joinedOutput, input, i, SKY_BLUE, 2);
-	}	
-	// If there are 2 or more targets found
-	if (boundingBoxes.size() >= 2) {
-		// Sort rectangles in descending order based on their area.
-		sort(boundingBoxes.begin(), boundingBoxes.end(), boundingBoxSortDescending); 
-
-		// Pick out two largest targets - these will most likely be what we're looking for.
-		Rect target1 = boundingBoxes[0];
-		Rect target2 = boundingBoxes[1];
-		
-		//Draws two rectanges onto output
-		rectangle(joinedOutput, target1, GREEN, 2);
-		rectangle(joinedOutput, target2, GREEN, 2);
-		
-		// Calculate center point of both targets
-		Point2f centerPoint1 = centerPoint(target1);	
-		Point2f centerPoint2 = centerPoint(target2);
-		
-		// Calculate mid points between centers of boundingBoxes
-		Point2f midPoint((centerPoint1.x + centerPoint2.x) / 2, (centerPoint1.y + centerPoint2.y) / 2); 
-		Point2f tl(midPoint.x - 2, midPoint.y - 2);	// Calculate top-left point of center dot
-		Point2f tr(midPoint.x + 2, midPoint.y + 2); // Calculate bottom right point of center dot
-		
-		// Draw a line between center point of vision targets
-		line(joinedOutput, centerPoint1, centerPoint2, RED, 1); 
-		// Draw a point at center of line drawn above
-		rectangle(joinedOutput, tl, tr, BLUE, 3);
-		
-		// Distance, angle, and offset calculation
-		double target1Width = target1.width;
-		double target2Width = target2.width;
-		double target1Height = target1.height;
-		double target2Height = target2.height;
-		double metricDistance = ((OBJECT_WIDTH * FOCAL_LENGTH)/(target1Width+target2Width))/2; // This is coincidentally in decameters
-		targetDistance = 3.9370*metricDistance; // Target's distance from robot (inches)
-		double target1Distance = 2*1106/target1Width;
-		double target2Distance = 2*1106/target2Width;
-		double target1B = (centerPoint1.x - (imageInput.cols/2)) * 1/(target1Width/1);
-		double target1C = target1Distance;
-		double target1A = sqrt(abs(pow(target1C,2)-pow(target1B,2)));
-		double target1Rads = atan(target1B/target1A);
-		double target1Offset = 57.3 * target1Rads;
-		if ((imageInput.cols/2)>centerPoint1.x){
-			target1Offset = -target1Offset;
-
-		}
-
-
-		double target2B = (centerPoint1.x - (imageInput.cols/2)) * 1/(target1Width/1);
-		double target2C = target2Distance;
-		double target2A = sqrt(abs( pow(target2C,2) - pow(target2B,2) ));
-
-		double target2Rads = atan(target2B/target2A);
-		double target2Offset = 57.3 * target2Rads;
-		if ((imageInput.cols/2)>centerPoint2.x){
-			target2Offset = -target2Offset;
-
-		}
-		targetOffset = (target1Offset+target2Offset)/2;
-
-		cout << "offset " << targetOffset << endl;
-		//cout << target1Distance << " 1dist 1wid " << target1Width << endl;
-
-
-		targetFound = true;
-
-		if (centerPoint1.x > midPoint.x){
-			targetAngle = target1Height - target2Height;	
-	    }
-		else{
-			targetAngle = target2Height - target1Height;
-		}
-		
-		// Put text on image (used for debugging)
-		putText(joinedOutput, "Offset: "+ to_string(targetOffset), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(joinedOutput, "Distance: "+ to_string(targetDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		
-	}
-	else {
-		targetFound = false;
-	}
+Point2f centerPoint(Rect rect) {
+	return Point2f(rect.x + (rect.width / 2), rect.y + (rect.height / 2));
 }
 
-void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &joinedOutput){	
+
+// Finds our cube in the contours
+void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output){	
 	// Readys Output mat for contour use
-	joinedOutput = Mat::zeros(imageInput.size(), CV_8UC3);
+	output = Mat::zeros(imageInput.size(), CV_8UC3);
 	// Creates Vector of Bounding Boxes
 	vector<Rect> boundingBoxes(input.size());
 	
@@ -250,7 +108,7 @@ void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &joined
 		// Makes contours rectanges and stores rectangles into bounding box vector.
 		boundingBoxes[i] = boundingRect(input[i]);
 		// Draws contours onto output
-		drawContours(joinedOutput, input, i, SKY_BLUE, 2);
+		drawContours(output, input, i, SKY_BLUE, 2);
 	}
 	
 	// If there are 1 or more targets found
@@ -262,55 +120,56 @@ void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &joined
 		Rect cube = boundingBoxes[0];
 		
 		//Draws rectangle onto output
-		rectangle(joinedOutput, cube, PURPLE, 2);
+		rectangle(output, cube, PURPLE, 2);
 		
-		// Calculate center point
-		Point2f cubeCenter = centerPoint(cube);	
-
     cubeDistance = 13*620/cube.width;
-    cubeOffset = cubeCenter.x ;
 
-		putText(joinedOutput, "Offset: "+ to_string(cubeOffset), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		putText(joinedOutput, "Distance: "+ to_string(cubeDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
-		
+
+
+
+
+
+
+		Point2f centerPoint1 = centerPoint(cube);	
+		// Distance, angle, and offset calculation
+		double cubeWidth = cube.width;
+		double cubeB = (centerPoint1.x - (imageInput.cols/2)) * 1/(cubeWidth/13);
+		double cubeC = cubeDistance;
+		double cubeA = sqrt(abs(pow(cubeC,2)-pow(cubeB,2)));
+		double cubeRads = asin(cubeB/cubeC);
+		cubeOffset = 57.3 * cubeRads;
+		if ((imageInput.cols/2)>centerPoint1.x){
+			cubeOffset = -cubeOffset;
+
+		}
+
+		putText(output, "Offset: "+ to_string(cubeOffset), Point2f(30,2*15), cv::FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
+		putText(output, "Distance: "+ to_string(cubeDistance), Point2f(30,3*15), FONT_HERSHEY_PLAIN, 0.8, WHITE, 1);
+		cout << "centerPOINT: " << centerPoint1.x << "CUBE WIDTH: " << cubeWidth << endl;
 		}
 	else {
 		targetFound = false;
 	}
 }
 
-// ============== Targeting END ============== //
+// ================================
 
-// Processes the image and returns a processed image
-Mat processImage(Mat &input){
-	// Mats for processed outputs
-	Mat hslOutput, maskOutput, targetsOutput;
+// Function to pull all functions together
+Mat cubeProcessImage(Mat &input){
   Mat cubeHslOutput, cubeMaskOutput, cubeTargetsOutput;
-  Mat joinedOutput;
-	// Create a HSL Mask
-	hslThreshold(input, hslOutput);
-	cubeHslThreshold(input, cubeHslOutput);
-	
 
+  cubeHslThreshold(input, cubeHslOutput);
+  cubeCreateMask(input, cubeHslOutput, cubeMaskOutput);
+  auto cubeContoursValueOutput = cubeCreateContours(cubeMaskOutput);
 
-	cubeCreateMask(input, cubeHslOutput, cubeMaskOutput);
-	createMask(input, hslOutput, maskOutput);
-	
-	auto contoursValueOutput = createContours(maskOutput);
-	auto cubeContoursValueOutput = cubeCreateContours(cubeMaskOutput);
-	
-  cubeFindTargets(cubeMaskOutput, cubeContoursValueOutput, joinedOutput);
-	findTargets(maskOutput, contoursValueOutput, joinedOutput);
-	
-	showCrosshairs(joinedOutput);
-  
-  return joinedOutput;
-  }
+  cubeFindTargets(cubeMaskOutput, cubeContoursValueOutput, cubeTargetsOutput);
+
+  showCrosshairs(cubeTargetsOutput);
+  return cubeTargetsOutput;
+}
 
 // Publish Network Tables to table in use
 void PublishNetworkTables(shared_ptr<NetworkTable> table) {
-	table->PutNumber("Distance", targetDistance);
-	table->PutNumber("Offset", targetOffset);
 	table->PutNumber("CubeDistance", cubeDistance);
 	table->PutNumber("CubeOffset", cubeOffset);
 	table->PutBoolean("TargetFound", targetFound);
@@ -318,12 +177,6 @@ void PublishNetworkTables(shared_ptr<NetworkTable> table) {
 
 // Get values for configurable values from NetworkTables
 void GetHSLValues(shared_ptr<NetworkTable> prefTable) {
-	// HSL
-	hue = prefTable->GetNumberArray("Hue", hue);
-	saturation = prefTable->GetNumberArray("Saturation", saturation);
-	luminance = prefTable->GetNumberArray("Luminance", luminance);
-
-
 	cubeHue = prefTable->GetNumberArray("Cube Hue", cubeHue);
 	cubeSaturation = prefTable->GetNumberArray("Cube Saturation", cubeSaturation);
 	cubeLuminance = prefTable->GetNumberArray("Cube Luminance", cubeLuminance);
@@ -357,8 +210,8 @@ void greetings(){
 	}
 }
 
-int main(int argc, char *argv[]) {
-						
+// MAIN
+int main(int argc, char *argv[]) {						
 	// Checks run arguments
 	checkRunParameters(argc, argv);
 
@@ -380,7 +233,8 @@ int main(int argc, char *argv[]) {
 
 	// Creates mats for storing image
 	Mat raw, processed;
-	// Starts video capture of camera 0;
+
+	// Starts video capture of camera 
 	VideoCapture capture(cameraInput);
 	if (!capture.isOpened()) {
 		cerr << "\n\e[31mERROR! Unable to open camera\nERROR! Is the camera connected?\e[0m\n";
@@ -393,23 +247,22 @@ int main(int argc, char *argv[]) {
 	while (!quit()) {
 		// Stores capture to raw mat
 		capture.read(raw);
-		
 		// Runs image processing and stores to processed
-		processed = processImage(raw);
-		
+		processed = cubeProcessImage(raw);
 		// Publishes Data to NetworkTable - Vision
 		PublishNetworkTables(visionTable);
-		
 		// Gets array values for Hue Saturation and Luminance from NURDVision table
 		GetHSLValues(visionTable);
 		// Publishes processed image to stream (checks to see if asking for raw)
-		(showRaw ? stream.PutFrame(raw) : stream.PutFrame(processed));
-	
+		(showRaw ? stream.PutFrame(processed) : stream.PutFrame(raw));
 		// Runs if debug is true
 		if(debug){
 			// Display processed image
+			imshow("Processed image", processed);
+			// Display raw image
+			imshow("Raw Image", raw);
 			// Output data to console
-			cout << "Distance: "<< targetDistance << "\tAngle: " << targetAngle << "\tOffset: " << targetOffset <<  endl;
+			cout << "Distance: "<< cubeDistance << "\tOffset: " << cubeOffset <<  endl;
 		}
 	}
 	NetworkTable::Shutdown();
