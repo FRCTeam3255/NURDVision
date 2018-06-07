@@ -152,6 +152,11 @@ void cubeFindTargets(Mat &imageInput, vector<vector<Point> > &input, Mat &output
 	}
 }
 
+
+
+
+
+
 // ================================
 
 // Function to pull all functions together
@@ -232,7 +237,7 @@ int main(int argc, char *argv[]) {
 		if(local) NetworkTable::SetIPAddress("localhost");
 
 	// Creates mats for storing image
-	Mat raw, processed;
+	Mat raw, processed, fun, grey;
 
 	// Starts video capture of camera 
 	VideoCapture capture(cameraInput);
@@ -248,21 +253,20 @@ int main(int argc, char *argv[]) {
 		// Stores capture to raw mat
 		capture.read(raw);
 		// Runs image processing and stores to processed
-		processed = cubeProcessImage(raw);
+
+		cvtColor(raw, grey, COLOR_BGR2GRAY);
+      	adaptiveThreshold(grey, fun, 125, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 11, 12);
+
+
 		// Publishes Data to NetworkTable - Vision
-		PublishNetworkTables(visionTable);
 		// Gets array values for Hue Saturation and Luminance from NURDVision table
-		GetHSLValues(visionTable);
 		// Publishes processed image to stream (checks to see if asking for raw)
-		(showRaw ? stream.PutFrame(processed) : stream.PutFrame(raw));
 		// Runs if debug is true
 		if(debug){
 			// Display processed image
-			imshow("Processed image", processed);
-			// Display raw image
-			imshow("Raw Image", raw);
+			// Fun
+			imshow("Fun", fun);
 			// Output data to console
-			cout << "Distance: "<< cubeDistance << "\tOffset: " << cubeOffset <<  endl;
 		}
 	}
 	NetworkTable::Shutdown();
