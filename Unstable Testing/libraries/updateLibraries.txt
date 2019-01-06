@@ -1,0 +1,5 @@
+http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/ntcore/ntcore-cpp/4.0.0/
+http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/wpiutil/wpiutil-cpp/3.0.0/
+http://first.wpi.edu/FRC/roborio/maven/release/edu/wpi/first/cscore/cscore-cpp/1.1.0/
+
+Use github downloads and build with: ./gradlew build -PskipAthena
